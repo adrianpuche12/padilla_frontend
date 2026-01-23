@@ -1,42 +1,40 @@
-import './App.css'
-import React from 'react'
-
+import { Routes, Route, Navigate } from 'react-router-dom';
+import LoginPage from './pages/LoginPage';
+import Dashboard from './pages/Dashboard';
+import PrivateRoute from './components/PrivateRoute';
+import PublicRoute from './components/PublicRoute';
+import './App.css';
 
 function App() {
   return (
-    <div className="app">
-      <header className="app-header">
-        <h1>Padilla Dashboard</h1>
-        <p>Sistema de gestion de leads inmobiliarios</p>
-      </header>
+    <Routes>
+      {/* Ruta publica - Login */}
+      <Route
+        path="/login"
+        element={
+          <PublicRoute>
+            <LoginPage />
+          </PublicRoute>
+        }
+      />
 
-      <main className="app-main">
-        <div className="status-card">
-          <h2>Estado del Sistema</h2>
-          <div className="status-indicator">
-            <span className="status-dot"></span>
-            <span>Frontend: Activo</span>
-          </div>
-          <p className="status-info">
-            React {React.version} + Vite
-          </p>
-        </div>
+      {/* Ruta protegida - Dashboard */}
+      <Route
+        path="/dashboard"
+        element={
+          <PrivateRoute>
+            <Dashboard />
+          </PrivateRoute>
+        }
+      />
 
-        <div className="info-card">
-          <h2>Proximos pasos</h2>
-          <ul>
-            <li>T-03: Integracion Backend con Keycloak</li>
-            <li>T-04: Autenticacion Frontend con Keycloak</li>
-            <li>T-05: Conexion segura Frontend - Backend</li>
-          </ul>
-        </div>
-      </main>
+      {/* Redireccion por defecto */}
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-      <footer className="app-footer">
-        <p>Padilla &copy; 2026 - Sprint 1</p>
-      </footer>
-    </div>
-  )
+      {/* Ruta no encontrada */}
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    </Routes>
+  );
 }
 
-export default App
+export default App;
