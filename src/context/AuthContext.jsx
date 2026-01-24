@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import authService from '../services/authService';
+import { setupInterceptors } from '../services/apiService';
 
 const AuthContext = createContext(null);
 
@@ -11,6 +12,34 @@ export function AuthProvider({ children }) {
   const [roles, setRoles] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [authError, setAuthError] = useState(null);
+
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
+    setUser(null);
+    setRoles([]);
+    setIsAuthenticated(false);
+    setAuthError(null);
+  }, []);
+
+  const getAccessToken = useCallback(() => {
+    return localStorage.getItem(TOKEN_KEY);
+  }, []);
+
+  // Configurar interceptores al montar
+  useEffect(() => {
+    const onUnauthorized = () => {
+      setAuthError({ type: 'unauthorized', message: 'Sesion expirada. Por favor inicia sesion nuevamente.' });
+      handleLogout();
+    };
+
+    const onForbidden = () => {
+      setAuthError({ type: 'forbidden', message: 'No tienes permisos para acceder a este recurso.' });
+    };
+
+    setupInterceptors(getAccessToken, onUnauthorized, onForbidden);
+  }, [getAccessToken, handleLogout]);
 
   // Verificar si hay sesion guardada al cargar
   useEffect(() => {
@@ -56,6 +85,7 @@ export function AuthProvider({ children }) {
     setUser({ username });
     setRoles(userRoles);
     setIsAuthenticated(true);
+    setAuthError(null);
   };
 
   const login = async (username, password) => {
@@ -78,24 +108,20 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(REFRESH_TOKEN_KEY);
-    setUser(null);
-    setRoles([]);
-    setIsAuthenticated(false);
-  };
-
-  const getAccessToken = () => {
-    return localStorage.getItem(TOKEN_KEY);
+  const clearAuthError = () => {
+    setAuthError(null);
   };
 
   const hasRole = (role) => {
-    return roles.includes(role);
+    return roles.some(r => r.toLowerCase() === role.toLowerCase());
   };
 
   const isAdmin = () => {
-    return hasRole('admin') || hasRole('ADMIN');
+    return hasRole('admin');
+  };
+
+  const isUser = () => {
+    return hasRole('user');
   };
 
   const value = {
@@ -103,11 +129,14 @@ export function AuthProvider({ children }) {
     roles,
     isAuthenticated,
     isLoading,
+    authError,
     login,
     logout,
     getAccessToken,
     hasRole,
     isAdmin,
+    isUser,
+    clearAuthError,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
