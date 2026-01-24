@@ -63,6 +63,7 @@
   --bg-darker: var(--color-black);
   --bg-input: var(--color-white);
   --bg-input-disabled: var(--color-gray-100);
+  --bg-subtle: var(--color-gray-100);
 
   /* Text colors */
   --text-primary: var(--color-gray-900);
