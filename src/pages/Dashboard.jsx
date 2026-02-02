@@ -140,7 +140,9 @@ function Dashboard() {
                     {sellers.map((seller) => (
                       <div key={seller.id} className="list-item">
                         <span className="item-name">{seller.fullname}</span>
-                        <span className="item-detail">{seller.cellphone}</span>
+                        <span className="item-detail">
+                         {seller.latestAssignee > 0 ? `Asignaciones: ${seller.latestAssignee}` : 'Sin asignaciones'}
+                        </span>
                       </div>
                     ))}
                   </div>
