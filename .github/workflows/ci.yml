@@ -1,0 +1,43 @@
+name: CI — Build & Test
+
+on:
+  push:
+    branches-ignore:
+      - main
+      - dev
+      - staging
+  pull_request:
+    branches:
+      - dev
+      - staging
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout codigo
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          VITE_API_URL: http://100.84.196.79:9080
+          VITE_ENV: ci
+
+      - name: Verificar Dockerfile
+        run: |
+          docker build \
+            --build-arg VITE_API_URL=http://100.84.196.79:9080 \
+            --no-cache \
+            -t padilla-frontend:ci-test .

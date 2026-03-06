@@ -1,0 +1,57 @@
+name: Deploy — STAGING
+
+on:
+  push:
+    branches:
+      - staging
+
+env:
+  IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/adrianpuche-padilla-frontend
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout codigo
+        uses: actions/checkout@v4
+
+      - name: Login DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build imagen staging (con VITE_API_URL de staging)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          build-args: |
+            VITE_API_URL=http://100.84.196.79:9180
+          tags: |
+            ${{ env.IMAGE }}:staging
+            ${{ env.IMAGE }}:staging-${{ github.sha }}
+
+      - name: Deploy en servidor STAGING
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            docker pull ${{ env.IMAGE }}:staging
+
+            if docker service ls | grep -q padilla-frontend-staging; then
+              docker service update \
+                --image ${{ env.IMAGE }}:staging \
+                --with-registry-auth \
+                padilla-frontend-staging
+            else
+              docker service create \
+                --name padilla-frontend-staging \
+                --network padilla-network-staging \
+                --publish 9182:80 \
+                --with-registry-auth \
+                ${{ env.IMAGE }}:staging
+            fi
