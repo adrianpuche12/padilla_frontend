@@ -10,7 +10,7 @@ env:
 
 jobs:
   deploy-prod:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, padilla-frontend]
     environment: production
 
     steps:
@@ -23,7 +23,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build imagen prod (con VITE_API_URL de prod)
+      - name: Build y push imagen prod
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -34,29 +34,23 @@ jobs:
             ${{ env.IMAGE }}:latest
             ${{ env.IMAGE }}:${{ github.sha }}
 
-      - name: Deploy en servidor PRODUCCION
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
-            docker pull ${{ env.IMAGE }}:latest
+      - name: Deploy servicio PRODUCCION
+        run: |
+          docker pull ${{ env.IMAGE }}:latest
 
-            if docker service ls | grep -q padilla-frontend-prod; then
-              docker service update \
-                --image ${{ env.IMAGE }}:latest \
-                --with-registry-auth \
-                padilla-frontend-prod
-            else
-              docker service create \
-                --name padilla-frontend-prod \
-                --network padilla-network-prod \
-                --publish 9082:80 \
-                --with-registry-auth \
-                ${{ env.IMAGE }}:latest
-            fi
+          if docker service ls | grep -q padilla-frontend-prod; then
+            docker service update \
+              --image ${{ env.IMAGE }}:latest \
+              --with-registry-auth \
+              padilla-frontend-prod
+          else
+            docker service create \
+              --name padilla-frontend-prod \
+              --network padilla-network-prod \
+              --publish 9082:80 \
+              --with-registry-auth \
+              ${{ env.IMAGE }}:latest
+          fi
 
-            sleep 10
-            curl -sf http://localhost:9082 || exit 1
-            echo "Deploy PROD exitoso"
+          sleep 10
+          curl -sf http://localhost:9082 && echo "Deploy PROD exitoso" || exit 1
