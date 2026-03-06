@@ -4,7 +4,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
-ARG VITE_API_URL=http://158.220.103.12:8080
+ARG VITE_API_URL=http://100.84.196.79:9080
 ENV VITE_API_URL=$VITE_API_URL
 RUN npm run build
 
