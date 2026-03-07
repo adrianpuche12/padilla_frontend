@@ -1,4 +1,4 @@
-import api from './authService';
+import api from './api';
 
 const userService = {
   async getUsers(role = null) {
