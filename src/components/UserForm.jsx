@@ -13,7 +13,7 @@ const ROLE_LEVEL = {
   PROVIDER: 3,
 };
 
-function UserForm({ user, onSubmit, onClose, isLoading }) {
+function UserForm({ user, onSubmit, onClose, isLoading, error }) {
   const { roles } = useAuth();
   const [form, setForm] = useState({ name: '', email: '', phone: '', role: '' });
   const [errors, setErrors] = useState({});
@@ -96,6 +96,8 @@ function UserForm({ user, onSubmit, onClose, isLoading }) {
               <input value={form.role} disabled />
             </div>
           )}
+          {error && <div className="form-error-banner">{error}</div>}
+
           <div className="modal-actions">
             <button type="button" className="btn-secondary" onClick={onClose} disabled={isLoading}>Cancelar</button>
             <button type="submit" className="btn-primary" disabled={isLoading}>
