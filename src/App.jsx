@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
+import Users from './pages/Users';
 import PrivateRoute from './components/PrivateRoute';
 import PublicRoute from './components/PublicRoute';
 import './App.css';
@@ -24,6 +25,16 @@ function App() {
         element={
           <PrivateRoute>
             <Dashboard />
+          </PrivateRoute>
+        }
+      />
+
+      {/* Ruta protegida - Usuarios */}
+      <Route
+        path="/users"
+        element={
+          <PrivateRoute>
+            <Users />
           </PrivateRoute>
         }
       />

@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import Layout from '../components/Layout';
 import dataService from '../services/dataService';
 import './Dashboard.css';
 
 function Dashboard() {
-  const { user, roles, logout, isAdmin } = useAuth();
+  const { user, roles, isAdmin } = useAuth();
 
   // Estados para los datos
   const [stats, setStats] = useState(null);
@@ -47,20 +48,6 @@ function Dashboard() {
     loadData();
   }, []);
 
-  const handleLogout = async () => {
-    await logout();
-  };
-
-  // Obtener iniciales del usuario
-  const getInitials = (username) => {
-    if (!username) return '?';
-    const parts = username.split(/[\s._-]+/);
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[1][0]).toUpperCase();
-    }
-    return username.substring(0, 2).toUpperCase();
-  };
-
   // Formatear fecha
   const formatDate = (dateString) => {
     if (!dateString) return '-';
@@ -68,22 +55,8 @@ function Dashboard() {
   };
 
   return (
-    <div className="dashboard">
-      <header className="dashboard-header">
-        <div className="header-left">
-          <h1>Dashboard</h1>
-        </div>
-        <div className="header-right">
-          <div className="user-avatar">
-            {getInitials(user?.username)}
-          </div>
-          <button onClick={handleLogout} className="logout-button">
-            Cerrar Sesion
-          </button>
-        </div>
-      </header>
-
-      <main className="dashboard-main">
+    <Layout title="Dashboard">
+      <div className="dashboard-main">
         {/* Error Banner */}
         {error && (
           <div className="error-banner">
@@ -221,8 +194,8 @@ function Dashboard() {
             )}
           </>
         )}
-      </main>
-    </div>
+      </div>
+    </Layout>
   );
 }
 
