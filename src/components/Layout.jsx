@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Layout.css';
 
 function Layout({ children, title }) {
   const { user, roles, logout } = useAuth();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const canManageUsers = () => {
     return roles.some(r =>
@@ -23,25 +25,33 @@ function Layout({ children, title }) {
   };
 
   return (
-    <div className="app-layout">
-      <aside className="sidebar">
+    <div className={`app-layout${sidebarCollapsed ? ' sidebar-is-collapsed' : ''}`}>
+      <aside className={`sidebar${sidebarCollapsed ? ' collapsed' : ''}`}>
         <div className="sidebar-brand">
-          <span className="sidebar-brand-text">Padilla</span>
+          {!sidebarCollapsed && <span className="sidebar-brand-text">Padilla</span>}
         </div>
 
         <nav className="sidebar-nav">
-          <NavLink to="/dashboard" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+          <NavLink to="/dashboard" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`} title="Dashboard">
             <span className="sidebar-icon">⊞</span>
-            Dashboard
+            {!sidebarCollapsed && 'Dashboard'}
           </NavLink>
 
           {canManageUsers() && (
-            <NavLink to="/users" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+            <NavLink to="/users" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`} title="Usuarios">
               <span className="sidebar-icon">👥</span>
-              Usuarios
+              {!sidebarCollapsed && 'Usuarios'}
             </NavLink>
           )}
         </nav>
+
+        <button
+          className="sidebar-toggle"
+          onClick={() => setSidebarCollapsed(prev => !prev)}
+          title={sidebarCollapsed ? 'Expandir menú' : 'Colapsar menú'}
+        >
+          {sidebarCollapsed ? '▶' : '◀'}
+        </button>
       </aside>
 
       <div className="app-main">
