@@ -7,7 +7,7 @@ const PROPERTY_STATUSES = ['AVAILABLE', 'RENTED', 'FOR_SALE', 'MAINTENANCE'];
 const TYPE_LABEL = { HOUSE: 'Casa', APARTMENT: 'Departamento', COMMERCIAL: 'Comercial', LAND: 'Terreno' };
 const STATUS_LABEL = { AVAILABLE: 'Disponible', RENTED: 'Alquilada', FOR_SALE: 'En venta', MAINTENANCE: 'Mantenimiento' };
 
-function PropertyForm({ property, owners, onSubmit, onClose, isLoading }) {
+function PropertyForm({ property, owners, onSubmit, onClose, isLoading, error }) {
   const [form, setForm] = useState({
     address: '',
     type: '',
@@ -126,6 +126,8 @@ function PropertyForm({ property, owners, onSubmit, onClose, isLoading }) {
               </select>
             </div>
           )}
+
+          {error && <div className="form-error-banner">{error}</div>}
 
           <div className="modal-actions">
             <button type="button" className="btn-secondary" onClick={onClose} disabled={isLoading}>Cancelar</button>

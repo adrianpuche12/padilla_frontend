@@ -3,6 +3,7 @@ import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
 import Users from './pages/Users';
 import Properties from './pages/Properties';
+import Contracts from './pages/Contracts';
 import PrivateRoute from './components/PrivateRoute';
 import PublicRoute from './components/PublicRoute';
 import './App.css';
@@ -46,6 +47,16 @@ function App() {
         element={
           <PrivateRoute>
             <Properties />
+          </PrivateRoute>
+        }
+      />
+
+      {/* Ruta protegida - Contratos */}
+      <Route
+        path="/contracts"
+        element={
+          <PrivateRoute>
+            <Contracts />
           </PrivateRoute>
         }
       />
