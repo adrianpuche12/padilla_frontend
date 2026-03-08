@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard';
 import Users from './pages/Users';
 import Properties from './pages/Properties';
 import Contracts from './pages/Contracts';
+import Tickets from './pages/Tickets';
 import PrivateRoute from './components/PrivateRoute';
 import PublicRoute from './components/PublicRoute';
 import './App.css';
@@ -57,6 +58,16 @@ function App() {
         element={
           <PrivateRoute>
             <Contracts />
+          </PrivateRoute>
+        }
+      />
+
+      {/* Ruta protegida - Tickets */}
+      <Route
+        path="/tickets"
+        element={
+          <PrivateRoute>
+            <Tickets />
           </PrivateRoute>
         }
       />
