@@ -86,6 +86,10 @@ function Tickets() {
       ]);
       setProviders(provData);
       setProperties(propData);
+      // Si el tenant tiene una sola propiedad, pre-seleccionarla
+      if (propData.length === 1) {
+        setCreateForm(prev => ({ ...prev, propertyId: propData[0].id }));
+      }
     } catch {
       // silencioso
     }
@@ -305,16 +309,22 @@ function Tickets() {
                 </div>
               </div>
               <div className="form-field">
-                <label>Propiedad *</label>
-                <select value={createForm.propertyId} onChange={e => setCreateForm(p => ({ ...p, propertyId: e.target.value }))} className="status-filter" style={{ width: '100%' }}>
-                  <option value="">-- Seleccionar propiedad --</option>
-                  {properties.map(p => <option key={p.id} value={p.id}>{p.address}</option>)}
-                </select>
+                <label>Propiedad</label>
+                {properties.length === 0 ? (
+                  <p className="no-property-msg">No tenés una propiedad asignada. Contactá al administrador.</p>
+                ) : properties.length === 1 ? (
+                  <p className="property-fixed">{properties[0].address}</p>
+                ) : (
+                  <select value={createForm.propertyId} onChange={e => setCreateForm(p => ({ ...p, propertyId: e.target.value }))} className="status-filter" style={{ width: '100%' }}>
+                    <option value="">-- Seleccionar propiedad --</option>
+                    {properties.map(p => <option key={p.id} value={p.id}>{p.address}</option>)}
+                  </select>
+                )}
               </div>
             </div>
             <div className="modal-actions confirm-actions">
               <button className="btn-secondary" onClick={() => setShowCreateForm(false)}>Cancelar</button>
-              <button className="btn-primary" onClick={handleCreate} disabled={createLoading}>
+              <button className="btn-primary" onClick={handleCreate} disabled={createLoading || properties.length === 0}>
                 {createLoading ? 'Creando...' : 'Crear ticket'}
               </button>
             </div>
