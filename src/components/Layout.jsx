@@ -53,13 +53,13 @@ function Layout({ children, title }) {
                 <span className="sidebar-icon">📄</span>
                 {!sidebarCollapsed && 'Contratos'}
               </NavLink>
-
-              <NavLink to="/tickets" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`} title="Tickets">
-                <span className="sidebar-icon">🔧</span>
-                {!sidebarCollapsed && 'Tickets'}
-              </NavLink>
             </>
           )}
+
+          <NavLink to="/tickets" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`} title="Tickets">
+            <span className="sidebar-icon">🔧</span>
+            {!sidebarCollapsed && 'Tickets'}
+          </NavLink>
         </nav>
 
         <button
