@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
+import { useAuth } from '../context/AuthContext';
 import ticketService from '../services/ticketService';
 import userService from '../services/userService';
 import propertyService from '../services/propertyService';
@@ -26,11 +27,23 @@ const PRIORITY_LABEL = { BAJA: 'Baja', NORMAL: 'Normal', URGENTE: 'Urgente' };
 
 const ALL_STATUSES = ['ABIERTA', 'EN_PROCESO', 'RESUELTA', 'CERRADA', 'RECHAZADA'];
 
+const CATEGORIES = ['PLOMERIA', 'ELECTRICIDAD', 'PINTURA', 'CERRAJERIA', 'GAS', 'OTRO'];
+const PRIORITIES = ['BAJA', 'NORMAL', 'URGENTE'];
+
 function Tickets() {
+  const { hasRole } = useAuth();
+  const isTenant = hasRole('TENANT') || hasRole('tenant');
+
   const [tickets, setTickets] = useState([]);
   const [providers, setProviders] = useState([]);
   const [properties, setProperties] = useState([]);
   const [filteredStatus, setFilteredStatus] = useState('');
+
+  // Create ticket modal
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [createForm, setCreateForm] = useState({ title: '', description: '', category: 'PLOMERIA', priority: 'NORMAL', propertyId: '' });
+  const [createLoading, setCreateLoading] = useState(false);
+  const [createError, setCreateError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -80,6 +93,25 @@ function Tickets() {
 
   useEffect(() => { loadTickets(); }, [filteredStatus]);
   useEffect(() => { loadReferenceData(); }, []);
+
+  const handleCreate = async () => {
+    if (!createForm.title.trim() || !createForm.description.trim() || !createForm.propertyId) {
+      setCreateError('Completá todos los campos obligatorios');
+      return;
+    }
+    setCreateLoading(true);
+    setCreateError(null);
+    try {
+      await ticketService.createTicket(createForm);
+      setShowCreateForm(false);
+      setCreateForm({ title: '', description: '', category: 'PLOMERIA', priority: 'NORMAL', propertyId: '' });
+      loadTickets();
+    } catch (err) {
+      setCreateError(err.response?.data?.message || 'Error al crear el ticket');
+    } finally {
+      setCreateLoading(false);
+    }
+  };
 
   const openDetail = async (ticket) => {
     setSelectedTicket(ticket);
@@ -152,6 +184,9 @@ function Tickets() {
             <option value="">Todos los estados</option>
             {ALL_STATUSES.map(s => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}
           </select>
+          {isTenant && (
+            <button className="btn-primary" onClick={() => setShowCreateForm(true)}>+ Nuevo ticket</button>
+          )}
         </div>
 
         {error && (
@@ -224,6 +259,68 @@ function Tickets() {
           </div>
         )}
       </div>
+
+      {/* Modal crear ticket */}
+      {showCreateForm && (
+        <div className="modal-overlay" onClick={() => setShowCreateForm(false)}>
+          <div className="modal confirm-modal" style={{ maxWidth: 500 }} onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Nuevo ticket</h2>
+              <button className="modal-close" onClick={() => setShowCreateForm(false)}>x</button>
+            </div>
+            <div className="confirm-body" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {createError && <div style={{ color: 'var(--color-error)', fontSize: 'var(--font-size-sm)' }}>{createError}</div>}
+              <div className="form-field">
+                <label>Titulo *</label>
+                <input
+                  type="text"
+                  value={createForm.title}
+                  onChange={e => setCreateForm(p => ({ ...p, title: e.target.value }))}
+                  placeholder="Ej: Canilla rota en baño"
+                  className="form-input"
+                />
+              </div>
+              <div className="form-field">
+                <label>Descripcion *</label>
+                <textarea
+                  value={createForm.description}
+                  onChange={e => setCreateForm(p => ({ ...p, description: e.target.value }))}
+                  placeholder="Describí el problema con detalle..."
+                  rows={3}
+                  className="form-input"
+                />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div className="form-field">
+                  <label>Categoria *</label>
+                  <select value={createForm.category} onChange={e => setCreateForm(p => ({ ...p, category: e.target.value }))} className="status-filter" style={{ width: '100%' }}>
+                    {CATEGORIES.map(c => <option key={c} value={c}>{CATEGORY_LABEL[c]}</option>)}
+                  </select>
+                </div>
+                <div className="form-field">
+                  <label>Prioridad</label>
+                  <select value={createForm.priority} onChange={e => setCreateForm(p => ({ ...p, priority: e.target.value }))} className="status-filter" style={{ width: '100%' }}>
+                    {PRIORITIES.map(p => <option key={p} value={p}>{PRIORITY_LABEL[p]}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div className="form-field">
+                <label>Propiedad *</label>
+                <select value={createForm.propertyId} onChange={e => setCreateForm(p => ({ ...p, propertyId: e.target.value }))} className="status-filter" style={{ width: '100%' }}>
+                  <option value="">-- Seleccionar propiedad --</option>
+                  {properties.map(p => <option key={p.id} value={p.id}>{p.address}</option>)}
+                </select>
+              </div>
+            </div>
+            <div className="modal-actions confirm-actions">
+              <button className="btn-secondary" onClick={() => setShowCreateForm(false)}>Cancelar</button>
+              <button className="btn-primary" onClick={handleCreate} disabled={createLoading}>
+                {createLoading ? 'Creando...' : 'Crear ticket'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal detalle / comentarios */}
       {selectedTicket && (
