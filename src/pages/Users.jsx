@@ -5,11 +5,12 @@ import UserForm from '../components/UserForm';
 import userService from '../services/userService';
 import './Users.css';
 
+
 const ROLE_LEVEL = { SUPER_ADMIN: 0, MANAGER: 1, ADMIN: 2, OWNER: 3, TENANT: 3, PROVIDER: 3 };
 const ALL_ROLES = ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'OWNER', 'TENANT', 'PROVIDER'];
 
 function Users() {
-  const { roles } = useAuth();
+  const { roles, isSuperAdmin } = useAuth();
   const [users, setUsers] = useState([]);
   const [filteredRole, setFilteredRole] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -19,6 +20,11 @@ function Users() {
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState(null);
   const [confirmDeactivate, setConfirmDeactivate] = useState(null);
+  const [confirmReactivate, setConfirmReactivate] = useState(null);
+  const [confirmResetPassword, setConfirmResetPassword] = useState(null);
+  const [resetPasswordResult, setResetPasswordResult] = useState(null);
+  const [resetPasswordLoading, setResetPasswordLoading] = useState(false);
+  const [newUserPassword, setNewUserPassword] = useState(null);
 
   const callerLevel = Math.min(
     ...roles.map(r => r.toUpperCase()).filter(r => ROLE_LEVEL[r] !== undefined).map(r => ROLE_LEVEL[r]),
@@ -48,8 +54,11 @@ function Users() {
   const handleCreate = async (data) => {
     setFormLoading(true); setFormError(null);
     try {
-      await userService.createUser(data);
+      const result = await userService.createUser(data);
       setShowForm(false);
+      if (result.temporaryPassword) {
+        setNewUserPassword({ name: result.user?.name || data.name, password: result.temporaryPassword });
+      }
       loadUsers();
     } catch (err) {
       setFormError(err.response?.data?.message || 'Error al crear el usuario');
@@ -75,6 +84,33 @@ function Users() {
     } catch (err) {
       setError('Error al desactivar el usuario');
     }
+  };
+
+  const handleReactivate = async (user) => {
+    try {
+      await userService.reactivateUser(user.id);
+      setConfirmReactivate(null);
+      setUsers(prev => prev.map(u => u.id === user.id ? { ...u, active: true } : u));
+    } catch (err) {
+      setError('Error al reactivar el usuario');
+    }
+  };
+
+  const handleResetPassword = async (user) => {
+    setResetPasswordLoading(true);
+    try {
+      const result = await userService.resetPassword(user.id);
+      setConfirmResetPassword(null);
+      setResetPasswordResult({ name: user.name, password: result.temporaryPassword });
+    } catch (err) {
+      setError('Error al resetear el password');
+    } finally {
+      setResetPasswordLoading(false);
+    }
+  };
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
   };
 
   const roleLabel = (role) => role?.replace('_', ' ') || '-';
@@ -122,8 +158,13 @@ function Users() {
                         {canManage(user.role) && (
                           <>
                             <button className="action-btn edit" onClick={() => setEditingUser(user)} title="Editar">✏️</button>
-                            {user.active && (
+                            {user.active ? (
                               <button className="action-btn deactivate" onClick={() => setConfirmDeactivate(user)} title="Desactivar">🚫</button>
+                            ) : (
+                              <button className="action-btn reactivate" onClick={() => setConfirmReactivate(user)} title="Reactivar">✅</button>
+                            )}
+                            {isSuperAdmin() && (
+                              <button className="action-btn reset-password" onClick={() => setConfirmResetPassword(user)} title="Resetear password">🔑</button>
                             )}
                           </>
                         )}
@@ -157,6 +198,91 @@ function Users() {
             <div className="modal-actions confirm-actions">
               <button className="btn-secondary" onClick={() => setConfirmDeactivate(null)}>Cancelar</button>
               <button className="btn-danger" onClick={() => handleDeactivate(confirmDeactivate)}>Desactivar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {confirmReactivate && (
+        <div className="modal-overlay" onClick={() => setConfirmReactivate(null)}>
+          <div className="modal confirm-modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Reactivar usuario</h2>
+              <button className="modal-close" onClick={() => setConfirmReactivate(null)}>×</button>
+            </div>
+            <div className="confirm-body">
+              <p>¿Confirmás que querés reactivar a <strong>{confirmReactivate.name}</strong>?</p>
+              <p className="confirm-note">El usuario recuperará acceso al sistema.</p>
+            </div>
+            <div className="modal-actions confirm-actions">
+              <button className="btn-secondary" onClick={() => setConfirmReactivate(null)}>Cancelar</button>
+              <button className="btn-primary" onClick={() => handleReactivate(confirmReactivate)}>Reactivar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {confirmResetPassword && (
+        <div className="modal-overlay" onClick={() => setConfirmResetPassword(null)}>
+          <div className="modal confirm-modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Resetear password</h2>
+              <button className="modal-close" onClick={() => setConfirmResetPassword(null)}>×</button>
+            </div>
+            <div className="confirm-body">
+              <p>¡Atención! Vas a resetear el password de <strong>{confirmResetPassword.name}</strong>.</p>
+              <p className="confirm-note">Se generará un nuevo password temporal que deberás comunicarle al usuario. ¿Continuar?</p>
+            </div>
+            <div className="modal-actions confirm-actions">
+              <button className="btn-secondary" onClick={() => setConfirmResetPassword(null)}>Cancelar</button>
+              <button className="btn-warning" onClick={() => handleResetPassword(confirmResetPassword)} disabled={resetPasswordLoading}>
+                {resetPasswordLoading ? 'Procesando...' : 'Resetear password'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {resetPasswordResult && (
+        <div className="modal-overlay" onClick={() => setResetPasswordResult(null)}>
+          <div className="modal confirm-modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Password reseteado</h2>
+              <button className="modal-close" onClick={() => setResetPasswordResult(null)}>×</button>
+            </div>
+            <div className="confirm-body">
+              <p>Password temporal generado para <strong>{resetPasswordResult.name}</strong>:</p>
+              <div className="password-result">
+                <code className="temp-password">{resetPasswordResult.password}</code>
+                <button className="btn-copy" onClick={() => copyToClipboard(resetPasswordResult.password)}>Copiar</button>
+              </div>
+              <p className="confirm-note">Comunica este password al usuario. Por seguridad no se almacena y no se puede recuperar luego.</p>
+            </div>
+            <div className="modal-actions confirm-actions">
+              <button className="btn-primary" onClick={() => setResetPasswordResult(null)}>Cerrar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {newUserPassword && (
+        <div className="modal-overlay" onClick={() => setNewUserPassword(null)}>
+          <div className="modal confirm-modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Usuario creado</h2>
+              <button className="modal-close" onClick={() => setNewUserPassword(null)}>×</button>
+            </div>
+            <div className="confirm-body">
+              <p>El usuario <strong>{newUserPassword.name}</strong> fue creado exitosamente.</p>
+              <p>Password temporal asignado:</p>
+              <div className="password-result">
+                <code className="temp-password">{newUserPassword.password}</code>
+                <button className="btn-copy" onClick={() => copyToClipboard(newUserPassword.password)}>Copiar</button>
+              </div>
+              <p className="confirm-note">Comunica este password al usuario. Deberá cambiarlo en el primer login.</p>
+            </div>
+            <div className="modal-actions confirm-actions">
+              <button className="btn-primary" onClick={() => setNewUserPassword(null)}>Entendido</button>
             </div>
           </div>
         </div>

@@ -43,6 +43,20 @@ const userService = {
       headers: getAuthHeader(),
     });
   },
+
+  async reactivateUser(id) {
+    const response = await axios.patch(`${API_URL}/api/users/${id}/activate`, {}, {
+      headers: getAuthHeader(),
+    });
+    return response.data;
+  },
+
+  async resetPassword(id) {
+    const response = await axios.post(`${API_URL}/api/users/${id}/reset-password`, {}, {
+      headers: getAuthHeader(),
+    });
+    return response.data;
+  },
 };
 
 export default userService;

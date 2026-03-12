@@ -98,6 +98,18 @@ export function AuthProvider({ children }) {
     return hasRole('admin') || hasRole('ADMIN');
   };
 
+  const isSuperAdmin = () => {
+    return hasRole('SUPER_ADMIN') || hasRole('super_admin');
+  };
+
+  const isManager = () => {
+    return hasRole('MANAGER') || hasRole('manager');
+  };
+
+  const hasManagementRole = () => {
+    return isSuperAdmin() || isManager() || isAdmin();
+  };
+
   const value = {
     user,
     roles,
@@ -108,6 +120,9 @@ export function AuthProvider({ children }) {
     getAccessToken,
     hasRole,
     isAdmin,
+    isSuperAdmin,
+    isManager,
+    hasManagementRole,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
