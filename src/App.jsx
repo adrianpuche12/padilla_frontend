@@ -84,15 +84,10 @@ function App() {
         }
       />
 
-      {/* Ruta protegida - Cambio de contraseña (primer login) */}
-      <Route
-        path="/change-password"
-        element={
-          <PrivateRoute>
-            <ChangePassword />
-          </PrivateRoute>
-        }
-      />
+      {/* Ruta semi-publica - Cambio de contraseña (primer login) */}
+      {/* No usa PrivateRoute para evitar race condition con isAuthenticated */}
+      {/* ChangePassword verifica el token directamente desde localStorage */}
+      <Route path="/change-password" element={<ChangePassword />} />
 
       {/* Redireccion por defecto */}
       <Route path="/" element={<Navigate to="/dashboard" replace />} />

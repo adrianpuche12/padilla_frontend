@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import authService from '../services/authService';
@@ -19,6 +19,13 @@ function ChangePassword() {
 
   const { getAccessToken, logout } = useAuth();
   const navigate = useNavigate();
+
+  // Verificar que hay token en localStorage (guarda sincrónicamente antes del state update)
+  useEffect(() => {
+    if (!getAccessToken()) {
+      navigate('/login', { replace: true });
+    }
+  }, []);
 
   const passedRules = RULES.filter((r) => r.test(newPassword));
   const allRulesPassed = passedRules.length === RULES.length;
