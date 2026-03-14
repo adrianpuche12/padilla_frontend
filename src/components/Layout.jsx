@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import './Layout.css';
 
 function Layout({ children, title }) {
-  const { user, roles, logout } = useAuth();
+  const { user, roles, logout, isSuperAdmin } = useAuth();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const canManageUsers = () => {
@@ -60,6 +60,13 @@ function Layout({ children, title }) {
             <span className="sidebar-icon">🔧</span>
             {!sidebarCollapsed && 'Tickets'}
           </NavLink>
+
+          {isSuperAdmin() && (
+            <NavLink to="/settings" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`} title="Configuración">
+              <span className="sidebar-icon">⚙️</span>
+              {!sidebarCollapsed && 'Configuración'}
+            </NavLink>
+          )}
         </nav>
 
         <button

@@ -101,3 +101,21 @@
 
 .password-result { display: flex; align-items: center; gap: var(--spacing-sm); background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: var(--spacing-sm) var(--spacing-md); margin: var(--spacing-sm) 0; }
 .temp-password { font-family: monospace; font-size: 1rem; font-weight: 700; letter-spacing: 0.05em; color: #1e293b; flex: 1; }
+
+.users-section { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+
+.users-section-title {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding-bottom: var(--spacing-xs);
+  border-bottom: 2px solid;
+}
+.users-section-title.system  { color: #7c3aed; border-bottom-color: #7c3aed; }
+.users-section-title.external { color: #0369a1; border-bottom-color: #0369a1; }
+
+.users-section-desc { margin: 0; font-size: var(--font-size-xs); color: var(--text-muted); }
+
+.empty-section { text-align: center; color: var(--text-muted); font-size: var(--font-size-sm); padding: var(--spacing-md); }

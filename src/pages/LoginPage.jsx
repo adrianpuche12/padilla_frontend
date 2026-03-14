@@ -18,12 +18,20 @@ function LoginPage() {
     setIsLoading(true);
 
     try {
-      await login(username, password);
-      navigate('/dashboard');
+      const data = await login(username, password);
+      if (data.first_login) {
+        navigate('/change-password');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       console.error('Error de login:', err);
       if (err.response?.status === 401) {
         setError('Usuario o contraseña incorrectos');
+      } else if (err.response?.status === 403 && err.response?.data?.error === 'ACCESS_EXPIRED') {
+        setError('Tu acceso temporal ha vencido. Contactá al administrador para recibir un nuevo acceso.');
+      } else if (err.response?.status === 400 && err.response?.data?.detail?.includes('Account disabled')) {
+        setError('Tu cuenta fue desactivada. Contactá al administrador.');
       } else {
         setError('Error al conectar con el servidor');
       }

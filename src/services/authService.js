@@ -88,6 +88,20 @@ const authService = {
   },
 
   /**
+   * Cambia el password en el primer login obligatorio
+   * @param {string} newPassword
+   * @param {string} accessToken - token del primer login
+   * @returns {Promise<void>}
+   */
+  async changePassword(newPassword, accessToken) {
+    const response = await axios.put(`${API_URL}/api/auth/change-password`,
+      { newPassword },
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
+    return response.data;
+  },
+
+  /**
    * Verifica si el token ha expirado
    * @param {string} token
    * @returns {boolean}

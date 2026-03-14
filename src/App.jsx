@@ -5,6 +5,8 @@ import Users from './pages/Users';
 import Properties from './pages/Properties';
 import Contracts from './pages/Contracts';
 import Tickets from './pages/Tickets';
+import Settings from './pages/Settings';
+import ChangePassword from './pages/ChangePassword';
 import PrivateRoute from './components/PrivateRoute';
 import PublicRoute from './components/PublicRoute';
 import './App.css';
@@ -68,6 +70,26 @@ function App() {
         element={
           <PrivateRoute>
             <Tickets />
+          </PrivateRoute>
+        }
+      />
+
+      {/* Ruta protegida - Configuracion (solo SUPER_ADMIN) */}
+      <Route
+        path="/settings"
+        element={
+          <PrivateRoute>
+            <Settings />
+          </PrivateRoute>
+        }
+      />
+
+      {/* Ruta protegida - Cambio de contraseña (primer login) */}
+      <Route
+        path="/change-password"
+        element={
+          <PrivateRoute>
+            <ChangePassword />
           </PrivateRoute>
         }
       />

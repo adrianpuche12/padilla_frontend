@@ -158,3 +158,37 @@
   --z-modal: 300;
   --z-toast: 400;
 }
+
+/* ==========================================
+   DARK MODE OVERRIDES
+   ========================================== */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Backgrounds */
+  --bg-page:             #0f1117;
+  --bg-card:             #1a1d28;
+  --bg-dark:             #0a0e1a;
+  --bg-darker:           #07090f;
+  --bg-input:            #1e2235;
+  --bg-input-disabled:   #1a1d28;
+  --bg-subtle:           #1e2235;
+
+  /* Text */
+  --text-primary:        #e2e8f0;
+  --text-secondary:      #94a3b8;
+  --text-muted:          #64748b;
+  --text-placeholder:    #475569;
+  --text-inverse:        #0f1117;
+
+  /* Borders */
+  --border-color:        #2d3350;
+  --border-color-focus:  var(--color-primary);
+
+  /* Shadows */
+  --card-shadow:         0 2px 8px rgba(0, 0, 0, 0.5);
+  --card-shadow-hover:   0 4px 16px rgba(0, 0, 0, 0.7);
+
+  /* Feedback — mantienen tono en oscuro */
+  --color-error-light:   #3b1515;
+}
