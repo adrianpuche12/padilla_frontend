@@ -20,7 +20,8 @@ function LoginPage() {
     try {
       const data = await login(username, password);
       if (data.first_login) {
-        navigate('/change-password', { replace: true });
+        // Usar window.location para evitar race condition con React 18 batching + startTransition de React Router
+        window.location.replace('/change-password');
       } else {
         navigate('/dashboard', { replace: true });
       }
