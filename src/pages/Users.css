@@ -72,9 +72,11 @@
 .role-badge.role-tenant      { background: #fce7f3; color: #9d174d; }
 .role-badge.role-provider    { background: #f1f5f9; color: #475569; }
 
-.status-badge { display: inline-block; padding: 2px var(--spacing-sm); border-radius: var(--radius-sm); font-size: var(--font-size-xs); font-weight: var(--font-weight-medium); }
+.status-badge { display: inline-block; padding: 2px var(--spacing-sm); border-radius: var(--radius-sm); font-size: var(--font-size-xs); font-weight: var(--font-weight-medium); white-space: nowrap; }
 .status-badge.active   { background: #e0f9f0; color: #065f46; }
 .status-badge.inactive { background: #f1f5f9; color: #64748b; }
+.status-badge.pending  { background: #fef9c3; color: #854d0e; }
+.status-badge.expired  { background: #fee2e2; color: #991b1b; }
 
 .row-actions { display: flex; gap: var(--spacing-xs); }
 .action-btn { background: none; border: none; cursor: pointer; font-size: 1rem; padding: 4px; border-radius: var(--radius-sm); transition: background var(--transition-fast); line-height: 1; }
@@ -90,7 +92,11 @@
 .btn-danger:hover { background: #b91c1c; }
 
 .action-btn.reactivate { color: #16a34a; }
+.action-btn.resend-access { color: #0369a1; display: flex; align-items: center; }
+.action-btn.resend-access:hover { background: #e0f2fe; }
 .action-btn.reset-password { color: #7c3aed; }
+.action-btn.delete { color: #dc2626; }
+.action-btn.delete:hover { background: #fee2e2; }
 
 .btn-warning { padding: var(--spacing-sm) var(--spacing-lg); background: #d97706; color: #fff; border: none; border-radius: var(--radius-sm); font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); cursor: pointer; transition: background var(--transition-fast); }
 .btn-warning:hover { background: #b45309; }

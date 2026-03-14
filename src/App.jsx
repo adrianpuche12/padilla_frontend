@@ -7,6 +7,7 @@ import Contracts from './pages/Contracts';
 import Tickets from './pages/Tickets';
 import Settings from './pages/Settings';
 import ChangePassword from './pages/ChangePassword';
+import ForgotPassword from './pages/ForgotPassword';
 import PrivateRoute from './components/PrivateRoute';
 import PublicRoute from './components/PublicRoute';
 import './App.css';
@@ -88,6 +89,9 @@ function App() {
       {/* No usa PrivateRoute para evitar race condition con isAuthenticated */}
       {/* ChangePassword verifica el token directamente desde localStorage */}
       <Route path="/change-password" element={<ChangePassword />} />
+
+      {/* Ruta publica - Olvidé mi contraseña */}
+      <Route path="/forgot-password" element={<ForgotPassword />} />
 
       {/* Redireccion por defecto */}
       <Route path="/" element={<Navigate to="/dashboard" replace />} />

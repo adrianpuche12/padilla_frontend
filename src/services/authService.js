@@ -88,6 +88,15 @@ const authService = {
   },
 
   /**
+   * Solicita restablecimiento de contraseña (flujo olvidé mi contraseña)
+   * @param {string} email
+   * @returns {Promise<void>}
+   */
+  async forgotPassword(email) {
+    await axios.post(`${API_URL}/api/auth/forgot-password`, { email });
+  },
+
+  /**
    * Cambia el password en el primer login obligatorio
    * @param {string} newPassword
    * @param {string} accessToken - token del primer login

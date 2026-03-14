@@ -23,8 +23,12 @@ function Users() {
   const [confirmDeactivate, setConfirmDeactivate] = useState(null);
   const [confirmReactivate, setConfirmReactivate] = useState(null);
   const [confirmResetPassword, setConfirmResetPassword] = useState(null);
+  const [confirmResendAccess, setConfirmResendAccess] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [resetPasswordResult, setResetPasswordResult] = useState(null);
   const [resetPasswordLoading, setResetPasswordLoading] = useState(false);
+  const [resendAccessLoading, setResendAccessLoading] = useState(false);
   const [newUserPassword, setNewUserPassword] = useState(null);
 
   const callerLevel = Math.min(
@@ -110,38 +114,96 @@ function Users() {
     }
   };
 
+  const handleDeletePermanently = async (user) => {
+    setDeleteLoading(true);
+    try {
+      await userService.deleteUserPermanently(user.id);
+      setConfirmDelete(null);
+      setUsers(prev => prev.filter(u => u.id !== user.id));
+    } catch (err) {
+      setError('Error al eliminar el usuario. Verificá que el servidor esté disponible.');
+      setConfirmDelete(null);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  const handleResendAccess = async (user) => {
+    setResendAccessLoading(true);
+    try {
+      await userService.resendAccess(user.id);
+      setConfirmResendAccess(null);
+      loadUsers();
+    } catch (err) {
+      setError('Error al reenviar el acceso. Verificá que el servidor esté disponible.');
+      setConfirmResendAccess(null);
+    } finally {
+      setResendAccessLoading(false);
+    }
+  };
+
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
   };
 
   const roleLabel = (role) => role?.replace('_', ' ') || '-';
 
-  const renderUserRow = (user) => (
-    <tr key={user.id} className={!user.active ? 'row-inactive' : ''}>
-      <td>{user.name}</td>
-      <td>{user.email}</td>
-      <td><span className={`role-badge role-${user.role?.toLowerCase()}`}>{roleLabel(user.role)}</span></td>
-      <td><span className={`status-badge ${user.active ? 'active' : 'inactive'}`}>{user.active ? 'Activo' : 'Inactivo'}</span></td>
-      <td>{user.createdAt ? new Date(user.createdAt).toLocaleDateString('es-AR') : '-'}</td>
-      <td>
-        <div className="row-actions">
-          {canManage(user.role) && (
-            <>
-              <button className="action-btn edit" onClick={() => setEditingUser(user)} title="Editar">✏️</button>
-              {user.active ? (
-                <button className="action-btn deactivate" onClick={() => setConfirmDeactivate(user)} title="Desactivar">🚫</button>
-              ) : (
-                <button className="action-btn reactivate" onClick={() => setConfirmReactivate(user)} title="Reactivar">✅</button>
-              )}
-              {isSuperAdmin() && (
-                <button className="action-btn reset-password" onClick={() => setConfirmResetPassword(user)} title="Resetear password">🔑</button>
-              )}
-            </>
-          )}
-        </div>
-      </td>
-    </tr>
-  );
+  // Calcula el estado real de la cuenta según firstLogin y passwordResetExpiresAt
+  const getAccountStatus = (user) => {
+    if (!user.active) return 'inactive';
+    if (!user.firstLogin) return 'active';
+    if (user.passwordResetExpiresAt && new Date(user.passwordResetExpiresAt) < new Date()) return 'expired';
+    return 'pending';
+  };
+
+  const STATUS_CONFIG = {
+    active:   { label: 'Activo',               className: 'active' },
+    pending:  { label: 'Pendiente activación',  className: 'pending' },
+    expired:  { label: 'Acceso expirado',        className: 'expired' },
+    inactive: { label: 'Inactivo',              className: 'inactive' },
+  };
+
+  const renderUserRow = (user) => {
+    const status = getAccountStatus(user);
+    const { label, className } = STATUS_CONFIG[status];
+    return (
+      <tr key={user.id} className={!user.active ? 'row-inactive' : ''}>
+        <td>{user.name}</td>
+        <td>{user.email}</td>
+        <td><span className={`role-badge role-${user.role?.toLowerCase()}`}>{roleLabel(user.role)}</span></td>
+        <td><span className={`status-badge ${className}`}>{label}</span></td>
+        <td>{user.createdAt ? new Date(user.createdAt).toLocaleDateString('es-AR') : '-'}</td>
+        <td>
+          <div className="row-actions">
+            {canManage(user.role) && (
+              <>
+                <button className="action-btn edit" onClick={() => setEditingUser(user)} title="Editar">✏️</button>
+                {user.active ? (
+                  <button className="action-btn deactivate" onClick={() => setConfirmDeactivate(user)} title="Desactivar">🚫</button>
+                ) : (
+                  <button className="action-btn reactivate" onClick={() => setConfirmReactivate(user)} title="Reactivar">✅</button>
+                )}
+                {user.active && user.firstLogin && (
+                  <button className="action-btn resend-access" onClick={() => setConfirmResendAccess(user)} title="Reenviar acceso">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                      <polyline points="22,6 12,13 2,6"/>
+                    </svg>
+                  </button>
+                )}
+                {isSuperAdmin() && (
+                  <button className="action-btn reset-password" onClick={() => setConfirmResetPassword(user)} title="Resetear password">🔑</button>
+                )}
+                {isSuperAdmin() && (
+                  <button className="action-btn delete" onClick={() => setConfirmDelete(user)} title="Eliminar permanentemente">🗑️</button>
+                )}
+              </>
+            )}
+          </div>
+        </td>
+      </tr>
+    );
+  };
 
   const renderTable = (userList) => (
     <div className="table-container">
@@ -202,29 +264,7 @@ function Users() {
                 <tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Estado</th><th>Alta</th><th>Acciones</th></tr>
               </thead>
               <tbody>
-                {users.map(user => (
-                  <tr key={user.id} className={!user.active ? 'row-inactive' : ''}>
-                    <td>{user.name}</td>
-                    <td>{user.email}</td>
-                    <td><span className={`role-badge role-${user.role?.toLowerCase()}`}>{roleLabel(user.role)}</span></td>
-                    <td><span className={`status-badge ${user.active ? 'active' : 'inactive'}`}>{user.active ? 'Activo' : 'Inactivo'}</span></td>
-                    <td>{user.createdAt ? new Date(user.createdAt).toLocaleDateString('es-AR') : '-'}</td>
-                    <td>
-                      <div className="row-actions">
-                        {canManage(user.role) && (
-                          <>
-                            <button className="action-btn edit" onClick={() => setEditingUser(user)} title="Editar">✏️</button>
-                            {user.active ? (
-                              <button className="action-btn deactivate" onClick={() => setConfirmDeactivate(user)} title="Desactivar">🚫</button>
-                            ) : (
-                              <button className="action-btn reactivate" onClick={() => setConfirmReactivate(user)} title="Reactivar">✅</button>
-                            )}
-                          </>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {users.map(user => renderUserRow(user))}
               </tbody>
             </table>
           </div>
@@ -284,12 +324,37 @@ function Users() {
             </div>
             <div className="confirm-body">
               <p>¡Atención! Vas a resetear el password de <strong>{confirmResetPassword.name}</strong>.</p>
-              <p className="confirm-note">Se generará un nuevo password temporal que deberás comunicarle al usuario. ¿Continuar?</p>
+              <p className="confirm-note">Se generará un nuevo password temporal y se enviará un email al usuario. ¿Continuar?</p>
             </div>
             <div className="modal-actions confirm-actions">
               <button className="btn-secondary" onClick={() => setConfirmResetPassword(null)}>Cancelar</button>
               <button className="btn-warning" onClick={() => handleResetPassword(confirmResetPassword)} disabled={resetPasswordLoading}>
                 {resetPasswordLoading ? 'Procesando...' : 'Resetear password'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {confirmResendAccess && (
+        <div className="modal-overlay" onClick={() => !resendAccessLoading && setConfirmResendAccess(null)}>
+          <div className="modal confirm-modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Reenviar acceso</h2>
+              <button className="modal-close" onClick={() => setConfirmResendAccess(null)} disabled={resendAccessLoading}>×</button>
+            </div>
+            <div className="confirm-body">
+              <p>Se va a generar un nuevo acceso temporal para <strong>{confirmResendAccess.name}</strong>.</p>
+              <p className="confirm-note">
+                {getAccountStatus(confirmResendAccess) === 'expired'
+                  ? 'El acceso anterior expiró. Se enviará un nuevo email con credenciales válidas por 24 horas.'
+                  : 'Se enviará un nuevo email con credenciales válidas por 24 horas.'}
+              </p>
+            </div>
+            <div className="modal-actions confirm-actions">
+              <button className="btn-secondary" onClick={() => setConfirmResendAccess(null)} disabled={resendAccessLoading}>Cancelar</button>
+              <button className="btn-primary" onClick={() => handleResendAccess(confirmResendAccess)} disabled={resendAccessLoading}>
+                {resendAccessLoading ? 'Enviando...' : 'Reenviar acceso'}
               </button>
             </div>
           </div>
@@ -309,10 +374,32 @@ function Users() {
                 <code className="temp-password">{resetPasswordResult.password}</code>
                 <button className="btn-copy" onClick={() => copyToClipboard(resetPasswordResult.password)}>Copiar</button>
               </div>
-              <p className="confirm-note">Comunica este password al usuario. Por seguridad no se almacena y no se puede recuperar luego.</p>
+              <p className="confirm-note">El usuario también recibió un email con este password. Podés copiarlo como respaldo.</p>
             </div>
             <div className="modal-actions confirm-actions">
               <button className="btn-primary" onClick={() => setResetPasswordResult(null)}>Cerrar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {confirmDelete && (
+        <div className="modal-overlay" onClick={() => !deleteLoading && setConfirmDelete(null)}>
+          <div className="modal confirm-modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Eliminar usuario permanentemente</h2>
+              <button className="modal-close" onClick={() => !deleteLoading && setConfirmDelete(null)} disabled={deleteLoading}>×</button>
+            </div>
+            <div className="confirm-body">
+              <p>⚠️ Esta acción es <strong>irreversible</strong>.</p>
+              <p>El usuario <strong>{confirmDelete.name}</strong> ({confirmDelete.email}) será eliminado completamente del sistema: base de datos y Keycloak.</p>
+              <p className="confirm-note">Una vez eliminado no se podrá recuperar.</p>
+            </div>
+            <div className="modal-actions confirm-actions">
+              <button className="btn-secondary" onClick={() => setConfirmDelete(null)} disabled={deleteLoading}>Cancelar</button>
+              <button className="btn-danger" onClick={() => handleDeletePermanently(confirmDelete)} disabled={deleteLoading}>
+                {deleteLoading ? 'Eliminando...' : 'Eliminar permanentemente'}
+              </button>
             </div>
           </div>
         </div>

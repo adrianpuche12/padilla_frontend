@@ -1,61 +1,48 @@
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
-
-const getAuthHeader = () => {
-  const token = localStorage.getItem('access_token');
-  return { Authorization: `Bearer ${token}` };
-};
+import api from './api';
 
 const userService = {
   async getUsers(role = null) {
     const params = role ? { role } : {};
-    const response = await axios.get(`${API_URL}/api/users`, {
-      headers: getAuthHeader(),
-      params,
-    });
+    const response = await api.get('/api/users', { params });
     return response.data;
   },
 
   async getUser(id) {
-    const response = await axios.get(`${API_URL}/api/users/${id}`, {
-      headers: getAuthHeader(),
-    });
+    const response = await api.get(`/api/users/${id}`);
     return response.data;
   },
 
   async createUser(data) {
-    const response = await axios.post(`${API_URL}/api/users`, data, {
-      headers: getAuthHeader(),
-    });
+    const response = await api.post('/api/users', data);
     return response.data;
   },
 
   async updateUser(id, data) {
-    const response = await axios.put(`${API_URL}/api/users/${id}`, data, {
-      headers: getAuthHeader(),
-    });
+    const response = await api.put(`/api/users/${id}`, data);
     return response.data;
   },
 
   async deactivateUser(id) {
-    await axios.delete(`${API_URL}/api/users/${id}`, {
-      headers: getAuthHeader(),
-    });
+    await api.delete(`/api/users/${id}`);
   },
 
   async reactivateUser(id) {
-    const response = await axios.patch(`${API_URL}/api/users/${id}/activate`, {}, {
-      headers: getAuthHeader(),
-    });
+    const response = await api.patch(`/api/users/${id}/activate`, {});
     return response.data;
   },
 
   async resetPassword(id) {
-    const response = await axios.post(`${API_URL}/api/users/${id}/reset-password`, {}, {
-      headers: getAuthHeader(),
-    });
+    const response = await api.post(`/api/users/${id}/reset-password`, {});
     return response.data;
+  },
+
+  async resendAccess(id) {
+    const response = await api.patch(`/api/users/${id}/resend-access`, {});
+    return response.data;
+  },
+
+  async deleteUserPermanently(id) {
+    await api.delete(`/api/users/${id}/permanent`);
   },
 };
 
