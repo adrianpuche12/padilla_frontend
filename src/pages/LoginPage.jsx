@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './LoginPage.css';
@@ -9,8 +9,18 @@ function LoginPage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const pendingRedirect = useRef(null);
+
+  // Navega solo después de que isAuthenticated sea true
+  useEffect(() => {
+    if (isAuthenticated && pendingRedirect.current) {
+      const path = pendingRedirect.current;
+      pendingRedirect.current = null;
+      navigate(path, { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,11 +29,7 @@ function LoginPage() {
 
     try {
       const data = await login(username, password);
-      if (data.first_login) {
-        navigate('/change-password');
-      } else {
-        navigate('/dashboard');
-      }
+      pendingRedirect.current = data.first_login ? '/change-password' : '/dashboard';
     } catch (err) {
       console.error('Error de login:', err);
       if (err.response?.status === 401) {
