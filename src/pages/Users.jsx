@@ -226,7 +226,7 @@ function Users() {
         <div className="users-toolbar">
           <select className="role-filter" value={filteredRole} onChange={e => setFilteredRole(e.target.value)}>
             <option value="">Todos los roles</option>
-            {ALL_ROLES.map(r => <option key={r} value={r}>{roleLabel(r)}</option>)}
+            {ALL_ROLES.filter(r => ROLE_LEVEL[r] > callerLevel).map(r => <option key={r} value={r}>{roleLabel(r)}</option>)}
           </select>
           {callerLevel < 3 && (
             <button className="btn-primary" onClick={() => setShowForm(true)}>+ Nuevo usuario</button>
