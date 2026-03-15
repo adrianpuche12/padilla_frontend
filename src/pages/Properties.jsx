@@ -1,12 +1,17 @@
 import { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import PropertyForm from '../components/PropertyForm';
+import PropertyDetailModal from '../components/PropertyDetailModal';
 import propertyService from '../services/propertyService';
 import userService from '../services/userService';
 import './Properties.css';
 
 const STATUS_LABEL = { AVAILABLE: 'Disponible', RENTED: 'Alquilada', FOR_SALE: 'En venta', MAINTENANCE: 'Mantenimiento' };
-const TYPE_LABEL = { HOUSE: 'Casa', APARTMENT: 'Depto', COMMERCIAL: 'Comercial', LAND: 'Terreno' };
+const TYPE_LABEL = {
+  CASA: 'Casa', CASA_PLANTA_ALTA: 'Casa Planta Alta', COCHERA: 'Cochera',
+  DEPARTAMENTO: 'Departamento', DEPTO_DUPLEX: 'Depto. Duplex', DEPTO_PASILLO: 'Depto. de pasillo',
+  GALPON: 'Galpón', LOCAL: 'Local', OFICINA: 'Oficina', TERRENO: 'Terreno', SIN_INFORMAR: 'Sin informar',
+};
 const ALL_STATUSES = ['AVAILABLE', 'RENTED', 'FOR_SALE', 'MAINTENANCE'];
 
 function Properties() {
@@ -17,6 +22,7 @@ function Properties() {
   const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [editingProperty, setEditingProperty] = useState(null);
+  const [viewingProperty, setViewingProperty] = useState(null);
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState(null);
   const [confirmDeactivate, setConfirmDeactivate] = useState(null);
@@ -45,6 +51,11 @@ function Properties() {
 
   useEffect(() => { loadProperties(); }, [filteredStatus]);
   useEffect(() => { loadOwners(); }, []);
+
+  const getOwnerName = (id) => {
+    const found = owners.find(o => o.id === id);
+    return found ? found.name : '-';
+  };
 
   const handleCreate = async (data) => {
     setFormLoading(true); setFormError(null);
@@ -117,6 +128,11 @@ function Properties() {
                     <td>{p.createdAt ? new Date(p.createdAt).toLocaleDateString('es-AR') : '-'}</td>
                     <td>
                       <div className="row-actions">
+                        <button className="action-btn view" onClick={() => setViewingProperty(p)} title="Ver detalle">
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                          </svg>
+                        </button>
                         {p.active && (
                           <>
                             <button className="action-btn edit" onClick={() => setEditingProperty(p)} title="Editar">✏️</button>
@@ -138,6 +154,13 @@ function Properties() {
       )}
       {editingProperty && (
         <PropertyForm property={editingProperty} owners={owners} onSubmit={handleUpdate} onClose={() => { setEditingProperty(null); setFormError(null); }} isLoading={formLoading} error={formError} />
+      )}
+      {viewingProperty && (
+        <PropertyDetailModal
+          property={viewingProperty}
+          ownerName={getOwnerName(viewingProperty.ownerId)}
+          onClose={() => setViewingProperty(null)}
+        />
       )}
       {confirmDeactivate && (
         <div className="modal-overlay" onClick={() => setConfirmDeactivate(null)}>
