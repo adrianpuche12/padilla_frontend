@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import ContractForm from '../components/ContractForm';
+import ContractDetailModal from '../components/ContractDetailModal';
 import contractService from '../services/contractService';
 import propertyService from '../services/propertyService';
 import userService from '../services/userService';
@@ -22,6 +23,7 @@ function Contracts() {
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState(null);
   const [confirmTerminate, setConfirmTerminate] = useState(null);
+  const [viewingContract, setViewingContract] = useState(null);
 
   const loadContracts = async () => {
     setIsLoading(true);
@@ -149,6 +151,11 @@ function Contracts() {
                     <td><span className={`status-badge status-${c.status?.toLowerCase()}`}>{STATUS_LABEL[c.status] || c.status}</span></td>
                     <td>
                       <div className="row-actions">
+                        <button className="action-btn view" onClick={() => setViewingContract(c)} title="Ver detalle">
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                          </svg>
+                        </button>
                         {c.status === 'ACTIVE' && (
                           <>
                             <button className="action-btn edit" onClick={() => setEditingContract(c)} title="Editar">✏️</button>
@@ -181,6 +188,16 @@ function Contracts() {
           isLoading={formLoading} error={formError}
         />
       )}
+      {viewingContract && (
+        <ContractDetailModal
+          contract={viewingContract}
+          propertyAddress={getPropertyAddress(viewingContract.propertyId)}
+          ownerName={getUserName(viewingContract.ownerId)}
+          tenantName={getUserName(viewingContract.tenantId)}
+          onClose={() => setViewingContract(null)}
+        />
+      )}
+
       {confirmTerminate && (
         <div className="modal-overlay" onClick={() => setConfirmTerminate(null)}>
           <div className="modal confirm-modal" onClick={e => e.stopPropagation()}>
