@@ -83,9 +83,18 @@ function Properties() {
     try {
       await propertyService.deactivateProperty(property.id);
       setConfirmDeactivate(null);
-      setProperties(prev => prev.map(p => p.id === property.id ? { ...p, active: false } : p));
+      setProperties(prev => prev.map(p => p.id === property.id ? { ...p, active: false, status: 'MAINTENANCE' } : p));
     } catch (err) {
       setError('Error al desactivar la propiedad');
+    }
+  };
+
+  const handleReactivate = async (property) => {
+    try {
+      await propertyService.reactivateProperty(property.id);
+      setProperties(prev => prev.map(p => p.id === property.id ? { ...p, active: true, status: 'AVAILABLE' } : p));
+    } catch (err) {
+      setError('Error al reactivar la propiedad');
     }
   };
 
@@ -133,11 +142,13 @@ function Properties() {
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
                           </svg>
                         </button>
-                        {p.active && (
+                        {p.active ? (
                           <>
                             <button className="action-btn edit" onClick={() => setEditingProperty(p)} title="Editar">✏️</button>
                             <button className="action-btn deactivate" onClick={() => setConfirmDeactivate(p)} title="Desactivar">🚫</button>
                           </>
+                        ) : (
+                          <button className="action-btn reactivate" onClick={() => handleReactivate(p)} title="Reactivar">✅</button>
                         )}
                       </div>
                     </td>

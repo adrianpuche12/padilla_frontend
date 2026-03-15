@@ -25,6 +25,10 @@ const propertyService = {
   async deactivateProperty(id) {
     await api.delete(`/api/properties/${id}`);
   },
+
+  async reactivateProperty(id) {
+    await api.patch(`/api/properties/${id}/reactivate`);
+  },
 };
 
 export default propertyService;
