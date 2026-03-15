@@ -45,6 +45,13 @@ const contractService = {
       headers: getAuthHeader(),
     });
   },
+
+  async getContractPeriods(id) {
+    const response = await axios.get(`${API_URL}/api/contracts/${id}/periods`, {
+      headers: getAuthHeader(),
+    });
+    return response.data;
+  },
 };
 
 export default contractService;
