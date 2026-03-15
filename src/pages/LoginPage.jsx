@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import ProperoLogo from '../brand/ProperoLogo';
+import { BRAND } from '../brand/brand';
 import './LoginPage.css';
 
 function LoginPage() {
@@ -46,8 +48,9 @@ function LoginPage() {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <h1>Padilla</h1>
-          <p>Sistema de Gestion de Leads</p>
+          <ProperoLogo size={56} className="login-brand-logo" />
+          <h1 className="login-brand-name">{BRAND.name}</h1>
+          <p className="login-brand-tagline">{BRAND.tagline}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">
@@ -112,7 +115,7 @@ function LoginPage() {
         </form>
 
         <div className="login-footer">
-          <p>Padilla &copy; 2026</p>
+          <p>{BRAND.name} &copy; {BRAND.year} &mdash; {BRAND.company}</p>
         </div>
       </div>
     </div>

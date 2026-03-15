@@ -125,3 +125,72 @@
 .users-section-desc { margin: 0; font-size: var(--font-size-xs); color: var(--text-muted); }
 
 .empty-section { text-align: center; color: var(--text-muted); font-size: var(--font-size-sm); padding: var(--spacing-md); }
+
+@media (max-width: 768px) {
+  /* Toolbar en columna */
+  .users-toolbar { flex-direction: column; align-items: stretch; }
+  .users-toolbar button, .users-toolbar select { width: 100%; }
+
+  /* Tabla → lista de cards */
+  .table-container { background: transparent; border: none; overflow: visible; }
+  .users-table { display: block; }
+  .users-table thead { display: none; }
+  .users-table tbody { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+
+  .users-table tbody tr {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md);
+  }
+
+  .users-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    border: none;
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+  }
+
+  /* Label a la izquierda via data-label */
+  .users-table td::before {
+    content: attr(data-label);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    margin-right: var(--spacing-sm);
+  }
+
+  /* Acciones: botones distribuidos en toda la card */
+  .users-table td[data-label="Acciones"] {
+    justify-content: space-around;
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--border-color);
+    margin-top: var(--spacing-xs);
+  }
+
+  .users-table td[data-label="Acciones"]::before {
+    display: none;
+  }
+
+  .users-table td[data-label="Acciones"] .row-actions {
+    width: 100%;
+    justify-content: space-around;
+  }
+
+  .users-table td[data-label="Acciones"] .action-btn {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    padding: var(--spacing-sm) 0;
+    font-size: 1.1rem;
+  }
+}

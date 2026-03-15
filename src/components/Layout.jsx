@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import ProperoLogo from '../brand/ProperoLogo';
+import { BRAND } from '../brand/brand';
 import './Layout.css';
 
 function Layout({ children, title }) {
   const { user, roles, logout, isSuperAdmin } = useAuth();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const canManageUsers = () => {
     return roles.some(r =>
@@ -26,48 +29,48 @@ function Layout({ children, title }) {
 
   return (
     <div className={`app-layout${sidebarCollapsed ? ' sidebar-is-collapsed' : ''}`}>
-      <aside className={`sidebar${sidebarCollapsed ? ' collapsed' : ''}`}>
+      {mobileMenuOpen && (
+        <div className="sidebar-overlay" onClick={() => setMobileMenuOpen(false)} />
+      )}
+      <aside className={`sidebar${sidebarCollapsed ? ' collapsed' : ''}${mobileMenuOpen ? ' mobile-open' : ''}`}>
         <div className="sidebar-brand">
-          {!sidebarCollapsed && <span className="sidebar-brand-text">Padilla</span>}
+          <ProperoLogo size={32} className="sidebar-brand-logo" />
+          {!sidebarCollapsed && <span className="sidebar-brand-text">{BRAND.name}</span>}
         </div>
 
-        <nav className="sidebar-nav">
-          <NavLink to="/dashboard" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`} title="Dashboard">
-            <span className="sidebar-icon">⊞</span>
-            {!sidebarCollapsed && 'Dashboard'}
-          </NavLink>
-
-          {canManageUsers() && (
-            <>
-              <NavLink to="/users" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`} title="Usuarios">
-                <span className="sidebar-icon">👥</span>
-                {!sidebarCollapsed && 'Usuarios'}
-              </NavLink>
-
-              <NavLink to="/properties" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`} title="Propiedades">
-                <span className="sidebar-icon">🏠</span>
-                {!sidebarCollapsed && 'Propiedades'}
-              </NavLink>
-
-              <NavLink to="/contracts" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`} title="Contratos">
-                <span className="sidebar-icon">📄</span>
-                {!sidebarCollapsed && 'Contratos'}
-              </NavLink>
-            </>
-          )}
-
-          <NavLink to="/tickets" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`} title="Tickets">
-            <span className="sidebar-icon">🔧</span>
-            {!sidebarCollapsed && 'Tickets'}
-          </NavLink>
-
-          {isSuperAdmin() && (
-            <NavLink to="/settings" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`} title="Configuración">
-              <span className="sidebar-icon">⚙️</span>
-              {!sidebarCollapsed && 'Configuración'}
+        {!sidebarCollapsed && (
+          <nav className="sidebar-nav">
+            <NavLink to="/dashboard" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+              Dashboard
             </NavLink>
-          )}
-        </nav>
+
+            {canManageUsers() && (
+              <>
+                <NavLink to="/users" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+                  Usuarios
+                </NavLink>
+
+                <NavLink to="/properties" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+                  Propiedades
+                </NavLink>
+
+                <NavLink to="/contracts" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+                  Contratos
+                </NavLink>
+              </>
+            )}
+
+            <NavLink to="/tickets" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+              Tickets
+            </NavLink>
+
+            {isSuperAdmin() && (
+              <NavLink to="/settings" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+                Configuración
+              </NavLink>
+            )}
+          </nav>
+        )}
 
         <button
           className="sidebar-toggle"
@@ -80,6 +83,13 @@ function Layout({ children, title }) {
 
       <div className="app-main">
         <header className="app-header">
+          <button className="mobile-menu-btn" onClick={() => setMobileMenuOpen(prev => !prev)} aria-label="Abrir menú">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect y="3" width="20" height="2" rx="1" fill="currentColor"/>
+              <rect y="9" width="20" height="2" rx="1" fill="currentColor"/>
+              <rect y="15" width="20" height="2" rx="1" fill="currentColor"/>
+            </svg>
+          </button>
           <h1 className="app-header-title">{title}</h1>
           <div className="app-header-right">
             <div className="user-avatar">{getInitials(user?.username)}</div>

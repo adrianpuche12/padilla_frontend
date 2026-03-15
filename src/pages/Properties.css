@@ -65,3 +65,12 @@
 
 .btn-danger { padding: var(--spacing-sm) var(--spacing-lg); background: #dc2626; color: #fff; border: none; border-radius: var(--radius-sm); font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); cursor: pointer; transition: background var(--transition-fast); }
 .btn-danger:hover { background: #b91c1c; }
+
+@media (max-width: 768px) {
+  .properties-toolbar { flex-direction: column; align-items: stretch; }
+  .properties-toolbar button, .properties-toolbar select { width: 100%; }
+  .table-container { overflow-x: auto; }
+  .properties-table { min-width: 560px; }
+  .properties-table th, .properties-table td { padding: var(--spacing-xs) var(--spacing-sm); }
+  .form-row { grid-template-columns: 1fr; }
+}

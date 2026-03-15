@@ -1,14 +1,25 @@
 /**
- * Padilla - Design System Variables
- * Based on brand colors from sramascopadilla.com.ar
+ * Propero — Design System Variables
+ * Un producto de Nilo Solutions
  *
  * Architecture:
- * 1. Primitive colors (raw values)
- * 2. Semantic colors (purpose-based)
- * 3. Component-specific tokens
+ * 1. Brand identity tokens  ← cambiar aqui para re-brandear
+ * 2. Primitive colors (raw values)
+ * 3. Semantic colors (purpose-based)
+ * 4. Component-specific tokens
  */
 
 :root {
+  /* ==========================================
+     BRAND IDENTITY — Propero by Nilo Solutions
+     Estos son los tokens de marca. Cambiar aqui
+     para actualizar colores de logo y acento
+     en toda la app.
+     ========================================== */
+  --brand-color-primary: #1A6B5A;
+  --brand-color-accent:  #4CAF7D;
+  --brand-color-dark:    #0f4538;
+
   /* ==========================================
      PRIMITIVE COLORS - Raw brand palette
      ========================================== */
@@ -43,10 +54,15 @@
      SEMANTIC COLORS - Purpose-based tokens
      ========================================== */
 
-  /* Primary actions & brand identity */
-  --color-primary: var(--color-red-500);
-  --color-primary-hover: var(--color-red-400);
-  --color-primary-active: var(--color-red-600);
+  /* Primary actions & brand identity — Propero */
+  --color-primary: var(--brand-color-primary);
+  --color-primary-hover: var(--brand-color-accent);
+  --color-primary-active: var(--brand-color-dark);
+
+  /* Sombras de color primario (reemplaza rgba hardcodeados) */
+  --color-primary-focus-ring: rgba(26, 107, 90, 0.2);
+  --color-primary-glow:       rgba(26, 107, 90, 0.4);
+  --color-primary-subtle:     rgba(26, 107, 90, 0.05);
 
   /* Secondary actions */
   --color-secondary: var(--color-blue-700);

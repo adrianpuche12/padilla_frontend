@@ -64,3 +64,12 @@
 
 .btn-danger { padding: var(--spacing-sm) var(--spacing-lg); background: #dc2626; color: #fff; border: none; border-radius: var(--radius-sm); font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); cursor: pointer; transition: background var(--transition-fast); }
 .btn-danger:hover { background: #b91c1c; }
+
+@media (max-width: 768px) {
+  .contracts-toolbar { flex-direction: column; align-items: stretch; }
+  .contracts-toolbar button, .contracts-toolbar select { width: 100%; }
+  .table-container { overflow-x: auto; }
+  .contracts-table { min-width: 580px; }
+  .contracts-table th, .contracts-table td { padding: var(--spacing-xs) var(--spacing-sm); }
+  .form-row { grid-template-columns: 1fr; }
+}

@@ -27,18 +27,14 @@ function Settings() {
                 <button
                   className={`theme-option ${!isDark ? 'selected' : ''}`}
                   onClick={() => setTheme('light')}
-                  title="Modo claro"
                 >
-                  <span className="theme-option-icon">☀️</span>
-                  <span className="theme-option-label">Claro</span>
+                  Claro
                 </button>
                 <button
                   className={`theme-option ${isDark ? 'selected' : ''}`}
                   onClick={() => setTheme('dark')}
-                  title="Modo oscuro"
                 >
-                  <span className="theme-option-icon">🌙</span>
-                  <span className="theme-option-label">Oscuro</span>
+                  Oscuro
                 </button>
               </div>
             </div>

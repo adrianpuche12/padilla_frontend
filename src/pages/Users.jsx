@@ -168,12 +168,12 @@ function Users() {
     const { label, className } = STATUS_CONFIG[status];
     return (
       <tr key={user.id} className={!user.active ? 'row-inactive' : ''}>
-        <td>{user.name}</td>
-        <td>{user.email}</td>
-        <td><span className={`role-badge role-${user.role?.toLowerCase()}`}>{roleLabel(user.role)}</span></td>
-        <td><span className={`status-badge ${className}`}>{label}</span></td>
-        <td>{user.createdAt ? new Date(user.createdAt).toLocaleDateString('es-AR') : '-'}</td>
-        <td>
+        <td data-label="Nombre">{user.name}</td>
+        <td data-label="Email">{user.email}</td>
+        <td data-label="Rol"><span className={`role-badge role-${user.role?.toLowerCase()}`}>{roleLabel(user.role)}</span></td>
+        <td data-label="Estado"><span className={`status-badge ${className}`}>{label}</span></td>
+        <td data-label="Alta">{user.createdAt ? new Date(user.createdAt).toLocaleDateString('es-AR') : '-'}</td>
+        <td data-label="Acciones">
           <div className="row-actions">
             {canManage(user.role) && (
               <>
