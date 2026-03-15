@@ -1,55 +1,35 @@
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
-
-const getAuthHeader = () => {
-  const token = localStorage.getItem('access_token');
-  return { Authorization: `Bearer ${token}` };
-};
+import api from './api';
 
 const contractService = {
   async getContracts(status = null, propertyId = null) {
     const params = {};
     if (status) params.status = status;
     if (propertyId) params.propertyId = propertyId;
-    const response = await axios.get(`${API_URL}/api/contracts`, {
-      headers: getAuthHeader(),
-      params,
-    });
+    const response = await api.get('/api/contracts', { params });
     return response.data;
   },
 
   async getContract(id) {
-    const response = await axios.get(`${API_URL}/api/contracts/${id}`, {
-      headers: getAuthHeader(),
-    });
+    const response = await api.get(`/api/contracts/${id}`);
     return response.data;
   },
 
   async createContract(data) {
-    const response = await axios.post(`${API_URL}/api/contracts`, data, {
-      headers: getAuthHeader(),
-    });
+    const response = await api.post('/api/contracts', data);
     return response.data;
   },
 
   async updateContract(id, data) {
-    const response = await axios.put(`${API_URL}/api/contracts/${id}`, data, {
-      headers: getAuthHeader(),
-    });
+    const response = await api.put(`/api/contracts/${id}`, data);
     return response.data;
   },
 
   async terminateContract(id) {
-    await axios.delete(`${API_URL}/api/contracts/${id}`, {
-      headers: getAuthHeader(),
-    });
+    await api.delete(`/api/contracts/${id}`);
   },
 
   async getContractPeriods(id) {
-    const response = await axios.get(`${API_URL}/api/contracts/${id}/periods`, {
-      headers: getAuthHeader(),
-    });
+    const response = await api.get(`/api/contracts/${id}/periods`);
     return response.data;
   },
 };
