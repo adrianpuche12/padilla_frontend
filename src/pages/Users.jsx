@@ -46,7 +46,8 @@ function Users() {
     setError(null);
     try {
       const data = await userService.getUsers(filteredRole || null);
-      setUsers(data);
+      // Solo mostrar usuarios del sistema (empleados), no clientes
+      setUsers(data.filter(u => SYSTEM_ROLES.includes(u.role)));
     } catch (err) {
       setError('Error al cargar los usuarios');
     } finally {
@@ -226,7 +227,7 @@ function Users() {
         <div className="users-toolbar">
           <select className="role-filter" value={filteredRole} onChange={e => setFilteredRole(e.target.value)}>
             <option value="">Todos los roles</option>
-            {ALL_ROLES.filter(r => ROLE_LEVEL[r] > callerLevel).map(r => <option key={r} value={r}>{roleLabel(r)}</option>)}
+            {SYSTEM_ROLES.filter(r => ROLE_LEVEL[r] > callerLevel).map(r => <option key={r} value={r}>{roleLabel(r)}</option>)}
           </select>
           {callerLevel < 3 && (
             <button className="btn-primary" onClick={() => setShowForm(true)}>+ Nuevo usuario</button>
@@ -244,29 +245,11 @@ function Users() {
           <div className="loading-container"><div className="loading-spinner"></div><p>Cargando usuarios...</p></div>
         ) : users.length === 0 ? (
           <div className="empty-state"><p>No hay usuarios para mostrar.</p></div>
-        ) : isSuperAdmin() ? (
-          <>
-            <div className="users-section">
-              <h3 className="users-section-title system">Usuarios del sistema</h3>
-              <p className="users-section-desc">Colaboradores con acceso al panel de gestión.</p>
-              {renderTable(users.filter(u => SYSTEM_ROLES.includes(u.role?.toUpperCase())))}
-            </div>
-            <div className="users-section">
-              <h3 className="users-section-title external">Otros usuarios</h3>
-              <p className="users-section-desc">Propietarios, inquilinos y proveedores vinculados.</p>
-              {renderTable(users.filter(u => !SYSTEM_ROLES.includes(u.role?.toUpperCase())))}
-            </div>
-          </>
         ) : (
-          <div className="table-container">
-            <table className="users-table">
-              <thead>
-                <tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Estado</th><th>Alta</th><th>Acciones</th></tr>
-              </thead>
-              <tbody>
-                {users.map(user => renderUserRow(user))}
-              </tbody>
-            </table>
+          <div className="users-section">
+            <h3 className="users-section-title system">Usuarios del Sistema</h3>
+            <p className="users-section-desc">Colaboradores de la empresa con acceso al panel de gestión.</p>
+            {renderTable(users)}
           </div>
         )}
       </div>

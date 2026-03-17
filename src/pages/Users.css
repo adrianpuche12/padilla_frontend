@@ -119,7 +119,7 @@
   padding-bottom: var(--spacing-xs);
   border-bottom: 2px solid;
 }
-.users-section-title.system  { color: #7c3aed; border-bottom-color: #7c3aed; }
+.users-section-title.system   { color: var(--brand-color-primary, #1A6B5A); border-bottom-color: var(--brand-color-primary, #1A6B5A); }
 .users-section-title.external { color: #0369a1; border-bottom-color: #0369a1; }
 
 .users-section-desc { margin: 0; font-size: var(--font-size-xs); color: var(--text-muted); }

@@ -225,24 +225,24 @@ function Tickets() {
               <tbody>
                 {tickets.map(t => (
                   <tr key={t.id}>
-                    <td>
+                    <td data-label="Título">
                       <button className="link-btn" onClick={() => openDetail(t)}>{t.title}</button>
                     </td>
-                    <td>{CATEGORY_LABEL[t.category] || t.category}</td>
-                    <td>
+                    <td data-label="Categoría">{CATEGORY_LABEL[t.category] || t.category}</td>
+                    <td data-label="Prioridad">
                       <span className={`priority-badge priority-${t.priority?.toLowerCase()}`}>
                         {PRIORITY_LABEL[t.priority] || t.priority}
                       </span>
                     </td>
-                    <td>{getPropertyAddress(t.propertyId)}</td>
-                    <td>{t.providerId ? getProviderName(t.providerId) : <span className="text-muted">Sin asignar</span>}</td>
-                    <td>
+                    <td data-label="Propiedad">{getPropertyAddress(t.propertyId)}</td>
+                    <td data-label="Proveedor">{t.providerId ? getProviderName(t.providerId) : <span className="text-muted">Sin asignar</span>}</td>
+                    <td data-label="Estado">
                       <span className={`status-badge status-${t.status?.toLowerCase()}`}>
                         {STATUS_LABEL[t.status] || t.status}
                       </span>
                     </td>
-                    <td>{formatDate(t.createdAt)}</td>
-                    <td>
+                    <td data-label="Creado">{formatDate(t.createdAt)}</td>
+                    <td data-label="Acciones">
                       <div className="row-actions">
                         {(t.status === 'ABIERTA' || t.status === 'EN_PROCESO') && (
                           <button className="action-btn" onClick={() => { setAssignTicket(t); setAssignProviderId(t.providerId || ''); }} title="Asignar proveedor">

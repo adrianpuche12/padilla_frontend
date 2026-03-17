@@ -142,14 +142,14 @@ function Contracts() {
               <tbody>
                 {contracts.map(c => (
                   <tr key={c.id} className={!c.active ? 'row-inactive' : ''}>
-                    <td>{getPropertyAddress(c.propertyId)}</td>
-                    <td>{getUserName(c.ownerId)}</td>
-                    <td>{getUserName(c.tenantId)}</td>
-                    <td>{formatDate(c.startDate)}</td>
-                    <td>{formatDate(c.endDate)}</td>
-                    <td>{formatAmount(c.monthlyAmount, c.currency)}</td>
-                    <td><span className={`status-badge status-${c.status?.toLowerCase()}`}>{STATUS_LABEL[c.status] || c.status}</span></td>
-                    <td>
+                    <td data-label="Propiedad">{getPropertyAddress(c.propertyId)}</td>
+                    <td data-label="Propietario">{getUserName(c.ownerId)}</td>
+                    <td data-label="Inquilino">{getUserName(c.tenantId)}</td>
+                    <td data-label="Inicio">{formatDate(c.startDate)}</td>
+                    <td data-label="Fin">{formatDate(c.endDate)}</td>
+                    <td data-label="Monto">{formatAmount(c.monthlyAmount, c.currency)}</td>
+                    <td data-label="Estado"><span className={`status-badge status-${c.status?.toLowerCase()}`}>{STATUS_LABEL[c.status] || c.status}</span></td>
+                    <td data-label="Acciones">
                       <div className="row-actions">
                         <button className="action-btn view" onClick={() => setViewingContract(c)} title="Ver detalle">
                           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

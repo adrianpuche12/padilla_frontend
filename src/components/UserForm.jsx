@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import './UserForm.css';
 
-const ALL_ROLES = ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'OWNER', 'TENANT', 'PROVIDER'];
+// Solo roles del sistema — los clientes (OWNER/TENANT/PROVIDER) se crean desde /clients
+const ALL_ROLES = ['SUPER_ADMIN', 'MANAGER', 'ADMIN'];
 
 const ROLE_LEVEL = {
   SUPER_ADMIN: 0,

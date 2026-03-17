@@ -129,13 +129,13 @@ function Properties() {
               <tbody>
                 {properties.map(p => (
                   <tr key={p.id} className={!p.active ? 'row-inactive' : ''}>
-                    <td>{p.address}</td>
-                    <td>{TYPE_LABEL[p.type] || p.type}</td>
-                    <td>{p.squareMeters || '-'}</td>
-                    <td>{p.rooms || '-'}</td>
-                    <td><span className={`status-badge status-${p.status?.toLowerCase()}`}>{STATUS_LABEL[p.status] || p.status}</span></td>
-                    <td>{p.createdAt ? new Date(p.createdAt).toLocaleDateString('es-AR') : '-'}</td>
-                    <td>
+                    <td data-label="Dirección">{p.address}</td>
+                    <td data-label="Tipo">{TYPE_LABEL[p.type] || p.type}</td>
+                    <td data-label="M²">{p.squareMeters || '-'}</td>
+                    <td data-label="Amb.">{p.rooms || '-'}</td>
+                    <td data-label="Estado"><span className={`status-badge status-${p.status?.toLowerCase()}`}>{STATUS_LABEL[p.status] || p.status}</span></td>
+                    <td data-label="Alta">{p.createdAt ? new Date(p.createdAt).toLocaleDateString('es-AR') : '-'}</td>
+                    <td data-label="Acciones">
                       <div className="row-actions">
                         <button className="action-btn view" onClick={() => setViewingProperty(p)} title="Ver detalle">
                           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

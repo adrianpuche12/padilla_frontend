@@ -105,9 +105,58 @@
 @media (max-width: 768px) {
   .tickets-toolbar { flex-direction: column; align-items: stretch; }
   .tickets-toolbar button, .tickets-toolbar select { width: 100%; }
-  .table-container { overflow-x: auto; }
-  .tickets-table { min-width: 620px; }
-  .tickets-table th, .tickets-table td { padding: var(--spacing-xs) var(--spacing-sm); }
+
+  .table-container { background: transparent; border: none; overflow: visible; }
+  .tickets-table { display: block; }
+  .tickets-table thead { display: none; }
+  .tickets-table tbody { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+
+  .tickets-table tbody tr {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md);
+  }
+
+  .tickets-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    border: none;
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+  }
+
+  .tickets-table td::before {
+    content: attr(data-label);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    margin-right: var(--spacing-sm);
+  }
+
+  .tickets-table td[data-label="Acciones"] {
+    justify-content: space-around;
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--border-color);
+    margin-top: var(--spacing-xs);
+  }
+  .tickets-table td[data-label="Acciones"]::before { display: none; }
+  .tickets-table td[data-label="Acciones"] .row-actions { width: 100%; justify-content: space-around; flex-wrap: wrap; gap: var(--spacing-xs); }
+  .tickets-table td[data-label="Acciones"] .action-btn { flex: 1; min-width: 80px; text-align: center; padding: var(--spacing-xs) var(--spacing-sm); }
+
   .ticket-detail-modal { width: 95vw; max-height: 90vh; }
   .ticket-meta { flex-direction: column; gap: var(--spacing-xs); }
+  .comment-actions { flex-direction: column; align-items: stretch; gap: var(--spacing-sm); }
+}
+
+@media (max-width: 480px) {
+  .tickets-toolbar button, .tickets-toolbar select { width: 100%; }
 }

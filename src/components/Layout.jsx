@@ -50,6 +50,14 @@ function Layout({ children, title }) {
                   Usuarios
                 </NavLink>
 
+                <NavLink to="/clients" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+                  Clientes
+                </NavLink>
+
+                <NavLink to="/providers" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+                  Proveedores
+                </NavLink>
+
                 <NavLink to="/properties" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
                   Propiedades
                 </NavLink>

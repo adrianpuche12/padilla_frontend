@@ -2,6 +2,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
 import Users from './pages/Users';
+import Clients from './pages/Clients';
+import Providers from './pages/Providers';
 import Properties from './pages/Properties';
 import Contracts from './pages/Contracts';
 import Tickets from './pages/Tickets';
@@ -35,12 +37,32 @@ function App() {
         }
       />
 
-      {/* Ruta protegida - Usuarios */}
+      {/* Ruta protegida - Usuarios del Sistema */}
       <Route
         path="/users"
         element={
           <PrivateRoute>
             <Users />
+          </PrivateRoute>
+        }
+      />
+
+      {/* Ruta protegida - Clientes (OWNER / TENANT / PROVIDER) */}
+      <Route
+        path="/clients"
+        element={
+          <PrivateRoute>
+            <Clients />
+          </PrivateRoute>
+        }
+      />
+
+      {/* Ruta protegida - Proveedores */}
+      <Route
+        path="/providers"
+        element={
+          <PrivateRoute>
+            <Providers />
           </PrivateRoute>
         }
       />

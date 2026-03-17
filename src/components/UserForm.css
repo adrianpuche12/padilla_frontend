@@ -131,3 +131,38 @@
 }
 
 .btn-secondary:hover:not(:disabled) { border-color: var(--color-secondary); color: var(--color-secondary); }
+
+/* Sección dentro de formularios extendidos (ej: ClientForm) */
+.form-section-title {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  margin-top: var(--spacing-sm);
+  padding-bottom: var(--spacing-xs);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+.form-field textarea {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  background: var(--bg-input);
+  outline: none;
+  font-family: inherit;
+}
+
+.form-field textarea:focus { border-color: var(--color-primary); }
+
+@media (max-width: 480px) {
+  .form-row { grid-template-columns: 1fr; }
+}

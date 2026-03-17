@@ -97,3 +97,31 @@
   color: #ffffff;
   box-shadow: 0 1px 6px rgba(26, 107, 90, 0.35);
 }
+
+@media (max-width: 768px) {
+  .settings-page {
+    max-width: 100%;
+  }
+
+  .settings-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+  }
+
+  .theme-toggle-group {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .theme-option {
+    flex: 1;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-row {
+    padding: var(--spacing-md);
+  }
+}

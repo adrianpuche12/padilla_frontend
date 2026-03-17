@@ -5,7 +5,7 @@ import dataService from '../services/dataService';
 import './Dashboard.css';
 
 function Dashboard() {
-  const { user, roles, isAdmin } = useAuth();
+  const { user, roles, isAdmin, hasManagementRole } = useAuth();
 
   // Estados para los datos
   const [stats, setStats] = useState(null);
@@ -26,8 +26,8 @@ function Dashboard() {
         const statsData = await dataService.getLeadStats();
         setStats(statsData);
 
-        // Cargar datos adicionales solo para admin
-        if (isAdmin()) {
+        // Cargar datos adicionales para roles de gestión (SUPER_ADMIN, MANAGER, ADMIN)
+        if (hasManagementRole()) {
           const [sellersData, sourcesData, leadsData] = await Promise.all([
             dataService.getSellers(),
             dataService.getSources(),
@@ -69,7 +69,7 @@ function Dashboard() {
         <div className="welcome-card">
           <h2>Bienvenido, {user?.username}</h2>
           <p>
-            {isAdmin()
+            {hasManagementRole()
               ? 'Tienes acceso de administrador al sistema.'
               : 'Has iniciado sesion correctamente en el sistema.'}
           </p>
@@ -106,7 +106,7 @@ function Dashboard() {
 
             <div className="info-grid">
               {/* Sellers Card - Solo Admin */}
-              {isAdmin() && (
+              {hasManagementRole() && (
                 <div className="info-card">
                   <h3>Vendedores ({sellers.length})</h3>
                   <div className="list-container">
@@ -123,7 +123,7 @@ function Dashboard() {
               )}
 
               {/* Sources Card - Solo Admin */}
-              {isAdmin() && (
+              {hasManagementRole() && (
                 <div className="info-card">
                   <h3>Fuentes de Leads ({sources.length})</h3>
                   <div className="list-container">
@@ -160,7 +160,7 @@ function Dashboard() {
             </div>
 
             {/* Portal Leads Table - Only for Admin */}
-            {isAdmin() && portalLeads.length > 0 && (
+            {hasManagementRole() && portalLeads.length > 0 && (
               <div className="data-section">
                 <h3>Ultimos Leads de Portales</h3>
                 <div className="table-container">
