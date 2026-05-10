@@ -7,6 +7,7 @@ import Providers from './pages/Providers';
 import Properties from './pages/Properties';
 import Contracts from './pages/Contracts';
 import Tickets from './pages/Tickets';
+import Reservas from './pages/Reservas';
 import Settings from './pages/Settings';
 import ChangePassword from './pages/ChangePassword';
 import ForgotPassword from './pages/ForgotPassword';
@@ -93,6 +94,16 @@ function App() {
         element={
           <PrivateRoute>
             <Tickets />
+          </PrivateRoute>
+        }
+      />
+
+      {/* Ruta protegida - Reservas (Recibos de Reserva) */}
+      <Route
+        path="/reservas"
+        element={
+          <PrivateRoute>
+            <Reservas />
           </PrivateRoute>
         }
       />

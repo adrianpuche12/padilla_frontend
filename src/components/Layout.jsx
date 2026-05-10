@@ -72,6 +72,12 @@ function Layout({ children, title }) {
               Tickets
             </NavLink>
 
+            {canManageUsers() && (
+              <NavLink to="/reservas" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+                Reservas
+              </NavLink>
+            )}
+
             {isSuperAdmin() && (
               <NavLink to="/settings" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
                 Configuración
