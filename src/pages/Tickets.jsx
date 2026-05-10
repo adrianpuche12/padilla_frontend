@@ -33,6 +33,7 @@ const PRIORITIES = ['BAJA', 'NORMAL', 'URGENTE'];
 function Tickets() {
   const { hasRole } = useAuth();
   const isTenant = hasRole('TENANT') || hasRole('tenant');
+  const isAdmin = hasRole('SUPER_ADMIN') || hasRole('MANAGER') || hasRole('ADMIN');
 
   const [tickets, setTickets] = useState([]);
   const [providers, setProviders] = useState([]);
@@ -51,6 +52,8 @@ function Tickets() {
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [comments, setComments] = useState([]);
   const [commentsLoading, setCommentsLoading] = useState(false);
+  const [providerHistory, setProviderHistory] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [isInternal, setIsInternal] = useState(false);
   const [commentSending, setCommentSending] = useState(false);
@@ -122,14 +125,21 @@ function Tickets() {
 
   const openDetail = async (ticket) => {
     setSelectedTicket(ticket);
+    setComments([]);
+    setProviderHistory([]);
+
     setCommentsLoading(true);
-    try {
-      const data = await ticketService.getComments(ticket.id);
-      setComments(data);
-    } catch {
-      setComments([]);
-    } finally {
-      setCommentsLoading(false);
+    ticketService.getComments(ticket.id)
+      .then(data => setComments(data))
+      .catch(() => setComments([]))
+      .finally(() => setCommentsLoading(false));
+
+    if (isAdmin) {
+      setHistoryLoading(true);
+      ticketService.getProviderHistory(ticket.id)
+        .then(data => setProviderHistory(data))
+        .catch(() => setProviderHistory([]))
+        .finally(() => setHistoryLoading(false));
     }
   };
 
@@ -191,6 +201,7 @@ function Tickets() {
   const getProviderName = (id) => providers.find(p => p.id === id)?.name || '-';
 
   const formatDate = (d) => d ? new Date(d).toLocaleDateString('es-AR') : '-';
+  const formatDateTime = (d) => d ? new Date(d).toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' }) : '-';
 
   return (
     <Layout title="Tickets">
@@ -364,6 +375,33 @@ function Tickets() {
                 {selectedTicket.rejectionReason && <span className="rejection-reason"><strong>Razon rechazo:</strong> {selectedTicket.rejectionReason}</span>}
               </div>
               <p className="ticket-description">{selectedTicket.description}</p>
+
+              {isAdmin && (
+                <div className="comments-section">
+                  <h3>Historial de proveedores</h3>
+                  {historyLoading ? (
+                    <div className="loading-container"><div className="loading-spinner"></div></div>
+                  ) : providerHistory.length === 0 ? (
+                    <p className="no-comments">Sin cambios de proveedor registrados.</p>
+                  ) : (
+                    <ul className="comments-list">
+                      {providerHistory.map(h => (
+                        <li key={h.id} className="comment-item">
+                          <div className="comment-header">
+                            <span className="comment-author">{h.changedBy?.slice(0, 8)}...</span>
+                            <span className="comment-date">{formatDateTime(h.changedAt)}</span>
+                          </div>
+                          <p>
+                            <span className="text-muted">{h.oldProviderId ? getProviderName(h.oldProviderId) : 'Sin proveedor'}</span>
+                            {' → '}
+                            <strong>{h.newProviderId ? getProviderName(h.newProviderId) : 'Sin proveedor'}</strong>
+                          </p>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
 
               <div className="comments-section">
                 <h3>Comentarios</h3>

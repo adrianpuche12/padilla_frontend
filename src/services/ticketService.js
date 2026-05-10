@@ -72,6 +72,13 @@ const ticketService = {
     );
     return response.data;
   },
+
+  async getProviderHistory(ticketId) {
+    const response = await axios.get(`${API_URL}/api/tickets/${ticketId}/provider-history`, {
+      headers: getAuthHeader(),
+    });
+    return response.data;
+  },
 };
 
 export default ticketService;
