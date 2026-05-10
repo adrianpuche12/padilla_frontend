@@ -60,6 +60,9 @@ function Tickets() {
   const [assignProviderId, setAssignProviderId] = useState('');
   const [assignLoading, setAssignLoading] = useState(false);
 
+  // Confirm provider change modal
+  const [confirmChange, setConfirmChange] = useState(null);
+
   // Reject modal
   const [rejectTicket, setRejectTicket] = useState(null);
   const [rejectReason, setRejectReason] = useState('');
@@ -145,19 +148,28 @@ function Tickets() {
     }
   };
 
-  const handleAssign = async () => {
-    if (!assignProviderId) return;
+  const doAssign = async (ticketId, providerId) => {
     setAssignLoading(true);
     try {
-      const updated = await ticketService.assignProvider(assignTicket.id, assignProviderId);
+      const updated = await ticketService.assignProvider(ticketId, providerId);
       setTickets(prev => prev.map(t => t.id === updated.id ? updated : t));
       setAssignTicket(null);
       setAssignProviderId('');
+      setConfirmChange(null);
     } catch {
       // ignorar
     } finally {
       setAssignLoading(false);
     }
+  };
+
+  const handleAssign = () => {
+    if (!assignProviderId) return;
+    if (assignTicket.providerId && assignTicket.providerId !== assignProviderId) {
+      setConfirmChange({ ticket: assignTicket, oldProviderId: assignTicket.providerId, newProviderId: assignProviderId });
+      return;
+    }
+    doAssign(assignTicket.id, assignProviderId);
   };
 
   const handleReject = async () => {
@@ -212,6 +224,7 @@ function Tickets() {
             <table className="tickets-table">
               <thead>
                 <tr>
+                  <th>Nº</th>
                   <th>Titulo</th>
                   <th>Categoria</th>
                   <th>Prioridad</th>
@@ -223,8 +236,9 @@ function Tickets() {
                 </tr>
               </thead>
               <tbody>
-                {tickets.map(t => (
+                {tickets.map((t, idx) => (
                   <tr key={t.id}>
+                    <td data-label="Nº">{t.ticketNumber || idx + 1}</td>
                     <td data-label="Título">
                       <button className="link-btn" onClick={() => openDetail(t)}>{t.title}</button>
                     </td>
@@ -419,6 +433,33 @@ function Tickets() {
               <button className="btn-secondary" onClick={() => setAssignTicket(null)}>Cancelar</button>
               <button className="btn-primary" onClick={handleAssign} disabled={assignLoading || !assignProviderId}>
                 {assignLoading ? 'Asignando...' : 'Asignar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal confirmar cambio de proveedor */}
+      {confirmChange && (
+        <div className="modal-overlay" onClick={() => setConfirmChange(null)}>
+          <div className="modal confirm-modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Confirmar cambio de proveedor</h2>
+              <button className="modal-close" onClick={() => setConfirmChange(null)}>x</button>
+            </div>
+            <div className="confirm-body">
+              <p>Ticket <strong>#{confirmChange.ticket.ticketNumber || confirmChange.ticket.id?.slice(0, 6)}</strong>: {confirmChange.ticket.title}</p>
+              <p style={{ marginTop: '12px' }}>
+                <span className="text-muted">Proveedor actual:</span> <strong>{getProviderName(confirmChange.oldProviderId)}</strong>
+              </p>
+              <p>
+                <span className="text-muted">Nuevo proveedor:</span> <strong>{getProviderName(confirmChange.newProviderId)}</strong>
+              </p>
+            </div>
+            <div className="modal-actions confirm-actions">
+              <button className="btn-secondary" onClick={() => setConfirmChange(null)}>Cancelar</button>
+              <button className="btn-primary" onClick={() => doAssign(confirmChange.ticket.id, confirmChange.newProviderId)} disabled={assignLoading}>
+                {assignLoading ? 'Cambiando...' : 'Confirmar cambio'}
               </button>
             </div>
           </div>
