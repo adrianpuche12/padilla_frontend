@@ -113,7 +113,7 @@
   background: var(--bg-card);
   transition: border-color 0.15s;
 }
-.form-group input:focus, .form-group select:focus { outline: none; border-color: var(--brand-color-primary, #1A6B5A); }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--brand-color-primary, #1A6B5A); }
 
 .form-group-inline { justify-content: flex-end; padding-bottom: 2px; }
 
@@ -138,6 +138,16 @@
 .dni-upload-btn:hover { border-color: var(--brand-color-primary, #1A6B5A); color: var(--brand-color-primary, #1A6B5A); background: #f0fdf4; }
 .dni-upload-btn.loading { opacity: 0.65; cursor: wait; }
 .dni-hint { font-size: var(--font-size-xs); color: var(--text-muted); margin: 0; }
+.btn-demo-fill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px;
+  background: #fffbeb; border: 1.5px solid #f59e0b;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm); font-weight: 600; color: #92400e;
+  cursor: pointer; transition: all 0.15s; width: fit-content;
+}
+.btn-demo-fill:hover { background: #fef3c7; }
+.reservas-form textarea { resize: vertical; min-height: 80px; }
 
 /* ── Monto en letras ─────────────────────────────────────────────────── */
 .monto-letras {
@@ -213,9 +223,26 @@
 .modal-body p { margin-bottom: var(--spacing-sm); }
 
 /* ── Print preview modal ─────────────────────────────────────────────── */
-.modal-print { max-width: 800px; width: 95vw; max-height: 90vh; overflow-y: auto; }
+.modal-print { max-width: 860px; width: 95vw; max-height: 90vh; overflow-y: auto; }
 
-/* ── Recibo document ─────────────────────────────────────────────────── */
+/* ── Doc tabs ────────────────────────────────────────────────────────── */
+.doc-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border-color); margin-right: 12px; }
+.doc-tab {
+  padding: 8px 16px;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  background: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-secondary);
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.doc-tab.active { color: var(--brand-color-primary, #1A6B5A); border-bottom-color: var(--brand-color-primary, #1A6B5A); }
+.doc-tab:hover { color: var(--text-primary); }
+
+/* ── Recibo / documento base ─────────────────────────────────────────── */
 .recibo-doc {
   padding: 32px 40px;
   font-family: 'Times New Roman', Times, serif;
@@ -248,25 +275,62 @@
 }
 
 .recibo-title-area { flex: 1; text-align: center; }
-.recibo-title {
-  margin: 0;
-  font-size: 16px;
+.recibo-title { margin: 0; font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+.recibo-subtitle { margin: 4px 0 0; font-size: 13px; font-weight: 600; }
+.recibo-fc { margin: 4px 0 0; font-size: 11px; color: #888; }
+
+.recibo-body-wrap { text-align: justify; }
+.recibo-body { margin: 0 0 10px; text-align: justify; }
+
+/* Listas de incisos */
+.lista-letras, .lista-sanciones {
+  margin: 4px 0 10px 20px;
+  padding-left: 8px;
+}
+.lista-letras  { list-style-type: lower-alpha; }
+.lista-sanciones { list-style-type: decimal; }
+.lista-letras li, .lista-sanciones li { margin-bottom: 6px; padding-left: 4px; text-align: justify; }
+.lista-letras li::marker, .lista-sanciones li::marker { font-weight: 700; }
+
+/* Cláusula titulo (CTR) */
+.clausula-titulo {
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
+  margin: 12px 0 4px;
 }
 
-.recibo-body { margin: 0 0 12px; text-align: justify; }
-.recibo-garantes { margin-bottom: 12px; }
-.recibo-garante-row { margin: 0 0 6px 16px; }
+/* Garante sección (CTR) */
+.ctr-garante-seccion {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  padding: 8px 12px;
+  margin: 6px 0;
+}
+.ctr-garante-titulo {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+/* Campo placeholder rojo (campos sin datos en CTR) */
+.campo-placeholder {
+  color: #c0392b;
+  font-style: italic;
+  font-weight: 700;
+}
 
 .recibo-firma {
   display: flex;
   justify-content: space-around;
-  margin-top: 60px;
+  margin-top: 56px;
   gap: 48px;
 }
-
 .recibo-firma-bloque { flex: 1; text-align: center; }
 .recibo-firma-linea { border-top: 1px solid #111; margin-bottom: 6px; }
 .recibo-firma-nombre { margin: 0; font-weight: 700; font-size: 12px; text-transform: uppercase; }
@@ -280,6 +344,7 @@
   .modal-print { display: block !important; max-height: none !important; overflow: visible !important; box-shadow: none !important; border: none !important; border-radius: 0 !important; }
   .print-hide { display: none !important; }
   .recibo-doc { padding: 0; }
+  .ctr-garante-seccion { background: none; }
 }
 
 /* ── Mobile ──────────────────────────────────────────────────────────── */
