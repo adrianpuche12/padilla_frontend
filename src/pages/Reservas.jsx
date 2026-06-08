@@ -316,7 +316,7 @@ function ContratoPreview({ r }) {
           En la ciudad de Rosario, provincia de Santa Fe, a los <strong>{fecha.dia}</strong> días del mes de <strong>{fecha.mes}</strong> de <strong>{fecha.anio}</strong>, entre:
         </p>
         <p className="recibo-body">
-          <strong>EL LOCADOR:</strong> Sr./Sra. <Vacio>NOMBRE PROPIETARIO</Vacio>, DNI Nº <Vacio>DNI PROPIETARIO</Vacio>, con domicilio en <Vacio>DOMICILIO PROPIETARIO</Vacio>, en adelante denominado/a "EL LOCADOR"; y
+          <strong>EL LOCADOR:</strong> Sr./Sra. {(r.locadorNombre || r.locadorApellido) ? <strong>{[r.locadorNombre, r.locadorApellido].filter(Boolean).join(' ')}</strong> : <Vacio>NOMBRE PROPIETARIO</Vacio>}, DNI Nº {r.locadorDni ? <strong>{r.locadorDni}</strong> : <Vacio>DNI PROPIETARIO</Vacio>}, con domicilio en {r.locadorDomicilio ? <strong>{r.locadorDomicilio}</strong> : <Vacio>DOMICILIO PROPIETARIO</Vacio>}, en adelante denominado/a "EL LOCADOR"; y
         </p>
         <p className="recibo-body">
           <strong>EL LOCATARIO:</strong> Sr./Sra. <strong>{nombre || '_______________'}</strong>,
@@ -471,6 +471,8 @@ const EMPTY_FORM = {
   tipoInmueble:'departamento', asesor:'',
   fechaRecibo: today(), medioPago:'transferencia',
   observaciones:'', apoderadoLocativa:'',
+  // Locador / propietario (feedback cliente 2026-06-08) — lo carga el operador, va al contrato (CTR)
+  locadorNombre:'', locadorApellido:'', locadorDni:'', locadorDomicilio:'',
   garantes:[{ ...EMPTY_GARANTE }],
 };
 
@@ -701,6 +703,7 @@ function Reservas() {
                       observaciones: 'Reserva confirmada con transferencia. Garantía propietaria + recibo de sueldo presentados.',
                       tipoGarantia: ['Propietaria','Laboral'],
                       cantidadPersonas: '2', tieneCoinquilino: false, coinquilinoNombre: '', apoderadoLocativa: '',
+                      locadorNombre: 'Roberto Daniel', locadorApellido: 'MARTÍNEZ', locadorDni: '16420385', locadorDomicilio: 'San Juan 2115, Rosario',
                       garantes: [{
                         nombre: 'GARCÍA, Carlos Alberto', apellidoMaterno: 'PÉREZ',
                         dni: '11223344', fechaNacimiento: '1962-03-22',
@@ -826,6 +829,19 @@ function Reservas() {
                     </div>
                   ))}
                   <button type="button" className="btn-add-garante" onClick={addGarante}>+ Agregar garante</button>
+                </div>
+
+                <div className="form-section">
+                  <div className="form-section-title">Locador / Propietario</div>
+                  <p className="form-section-hint">No viene del formulario del inquilino — lo completás vos. Se vuelca al Contrato de Locación (CTR).</p>
+                  <div className="form-row">
+                    <div className="form-group"><label>Nombre del locador</label><input value={formData.locadorNombre} onChange={e => setField('locadorNombre', e.target.value)} placeholder="Roberto Daniel" /></div>
+                    <div className="form-group"><label>Apellido del locador</label><input value={formData.locadorApellido} onChange={e => setField('locadorApellido', e.target.value)} placeholder="MARTÍNEZ" /></div>
+                  </div>
+                  <div className="form-row">
+                    <div className="form-group"><label>DNI del locador</label><input value={formData.locadorDni} onChange={e => setField('locadorDni', e.target.value)} placeholder="16420385" /></div>
+                    <div className="form-group"><label>Domicilio del locador</label><input value={formData.locadorDomicilio} onChange={e => setField('locadorDomicilio', e.target.value)} placeholder="San Juan 2115, Rosario" /></div>
+                  </div>
                 </div>
 
                 <div className="form-section">
