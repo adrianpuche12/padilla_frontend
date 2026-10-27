@@ -1,0 +1,45 @@
+/* Panel de Ayuda: a la derecha, debajo de la barra superior; en el celular ocupa toda la pantalla. */
+.ayuda {
+  position: fixed; top: 60px; right: 0; bottom: 0; width: min(440px, 100vw); z-index: 900;
+  display: flex; flex-direction: column; background: var(--bg-card, #fff); color: var(--text-primary, #222);
+  border-left: 1px solid var(--border-color, #e3e7ea); box-shadow: -8px 0 28px rgba(0, 0, 0, .12);
+}
+.ayuda__cabecera { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px 8px; }
+.ayuda__titulo { margin: 0; font-size: 1.15rem; font-weight: 600; }
+.ayuda__cerrar { border: 0; background: none; font-size: 1.6rem; line-height: 1; cursor: pointer; color: inherit; padding: 2px 8px; border-radius: 6px; }
+.ayuda__cerrar:hover, .ayuda__cerrar:focus-visible { background: rgba(0, 0, 0, .06); }
+.ayuda__buscador { padding: 4px 18px 12px; border-bottom: 1px solid var(--border-color, #e3e7ea); }
+.ayuda__buscar { width: 100%; box-sizing: border-box; padding: 9px 12px; border: 1px solid var(--border-color, #cfd6db); border-radius: 8px; font-size: .95rem; background: transparent; color: inherit; }
+.ayuda__buscar:focus { outline: 2px solid var(--brand-color-accent, #4caf7d); outline-offset: 1px; }
+.ayuda__cuerpo { flex: 1; overflow-y: auto; padding: 12px 18px 28px; }
+.ayuda__seccion { margin: 14px 0 6px; font-size: .75rem; letter-spacing: .06em; text-transform: uppercase; color: var(--text-secondary, #6b7780); }
+.ayuda__aca { border: 1px solid var(--brand-color-accent, #4caf7d); border-radius: 10px; padding: 2px 10px 8px; }
+.ayuda__lista { list-style: none; margin: 0; padding: 0; }
+.ayuda__item { display: flex; gap: 10px; align-items: flex-start; width: 100%; text-align: left; border: 0; background: none; padding: 8px 6px; border-radius: 8px; cursor: pointer; color: inherit; font: inherit; }
+.ayuda__item:hover, .ayuda__item:focus-visible { background: rgba(76, 175, 125, .10); }
+.ayuda__miniatura { position: relative; flex: 0 0 96px; height: 54px; border-radius: 6px; overflow: hidden; background: #0f2e33; }
+.ayuda__miniatura img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ayuda__play { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.1rem; text-shadow: 0 1px 4px rgba(0, 0, 0, .6); }
+.ayuda__item-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ayuda__item-titulo { font-weight: 600; font-size: .92rem; }
+.ayuda__item-resumen { font-size: .8rem; color: var(--text-secondary, #6b7780); }
+.ayuda__vacio { color: var(--text-secondary, #6b7780); font-size: .9rem; }
+.ayuda__volver { border: 0; background: none; color: var(--brand-color-primary, #1a6b5a); font-weight: 600; cursor: pointer; padding: 4px 0 10px; font-size: .9rem; }
+.ayuda__tema-titulo { margin: 0 0 4px; font-size: 1.1rem; }
+.ayuda__resumen { margin: 0 0 12px; color: var(--text-secondary, #6b7780); font-size: .9rem; }
+.ayuda__subtitulo { margin: 16px 0 6px; font-size: .95rem; }
+.ayuda__pasos, .ayuda__ojo ul { margin: 0; padding-left: 20px; font-size: .9rem; line-height: 1.5; }
+.ayuda__pasos li, .ayuda__ojo li { margin-bottom: 6px; }
+.ayuda__ojo { margin-top: 14px; padding: 4px 12px 8px; border-radius: 8px; background: rgba(76, 175, 125, .10); }
+.ayuda__ir { display: inline-block; margin-top: 14px; color: var(--brand-color-primary, #1a6b5a); font-weight: 600; }
+.ayuda__video video { width: 100%; border-radius: 8px; background: #0f2e33; display: block; }
+.ayuda__nota { margin: 6px 0 4px; font-size: .78rem; color: var(--text-secondary, #6b7780); }
+.ayuda__pasos-del-video { list-style: none; margin: 6px 0 0; padding: 0; max-height: 210px; overflow-y: auto; border: 1px solid var(--border-color, #e3e7ea); border-radius: 8px; }
+.ayuda__pasos-del-video button { width: 100%; text-align: left; border: 0; background: none; padding: 6px 10px; font: inherit; font-size: .82rem; color: inherit; cursor: pointer; }
+.ayuda__pasos-del-video button:hover { background: rgba(0, 0, 0, .04); }
+.ayuda__pasos-del-video button.es-actual { background: rgba(76, 175, 125, .16); font-weight: 600; }
+.ayuda__tiempo { display: inline-block; min-width: 34px; color: var(--text-secondary, #6b7780); font-variant-numeric: tabular-nums; }
+.ayuda-boton { border: 1px solid var(--border-color, #d5dbe0); background: transparent; color: inherit; border-radius: 6px; padding: 6px 14px; cursor: pointer; font: inherit; font-size: .9rem; }
+.ayuda-boton[aria-expanded="true"] { border-color: var(--brand-color-accent, #4caf7d); color: var(--brand-color-primary, #1a6b5a); }
+@media (max-width: 640px) { .ayuda { top: 0; width: 100vw; } }
+@media print { .ayuda, .ayuda-boton { display: none !important; } }

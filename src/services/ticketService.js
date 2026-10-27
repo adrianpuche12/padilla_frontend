@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8080';
 
 const getAuthHeader = () => {
   const token = localStorage.getItem('access_token');
@@ -70,6 +70,13 @@ const ticketService = {
       { content, internal },
       { headers: getAuthHeader() }
     );
+    return response.data;
+  },
+
+  async getProviderHistory(ticketId) {
+    const response = await axios.get(`${API_URL}/api/tickets/${ticketId}/provider-history`, {
+      headers: getAuthHeader(),
+    });
     return response.data;
   },
 };
