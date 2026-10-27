@@ -32,12 +32,12 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          VITE_API_URL: http://100.84.196.79:9080
+          VITE_API_URL: ""
           VITE_ENV: ci
 
       - name: Verificar Dockerfile
         run: |
           docker build \
-            --build-arg VITE_API_URL=http://100.84.196.79:9080 \
+            --build-arg VITE_API_URL= \
             --no-cache \
             -t padilla-frontend:ci-test .
