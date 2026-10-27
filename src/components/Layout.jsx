@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { useCallback, useState } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
+import PanelDeAyuda from '../ayuda/PanelDeAyuda';
 import { useAuth } from '../context/AuthContext';
 import ProperoLogo from '../brand/ProperoLogo';
 import { BRAND } from '../brand/brand';
@@ -9,6 +10,9 @@ function Layout({ children, title }) {
   const { user, roles, logout, isSuperAdmin } = useAuth();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [ayudaAbierta, setAyudaAbierta] = useState(false);
+  const cerrarAyuda = useCallback(() => setAyudaAbierta(false), []);
+  const pantallaActual = useLocation().pathname.split('/')[1] || 'dashboard';
 
   const canManageUsers = () => {
     return roles.some(r =>
@@ -108,6 +112,15 @@ function Layout({ children, title }) {
           <div className="app-header-right">
             <div className="user-avatar">{getInitials(user?.username)}</div>
             <span className="header-username">{user?.username}</span>
+            <button
+              type="button"
+              className="ayuda-boton"
+              onClick={() => setAyudaAbierta((a) => !a)}
+              aria-expanded={ayudaAbierta}
+              title="Ayuda: cómo se usa cada pantalla, con videos paso a paso"
+            >
+              Ayuda
+            </button>
             <button onClick={handleLogout} className="logout-button">
               Cerrar Sesion
             </button>
@@ -117,6 +130,7 @@ function Layout({ children, title }) {
         <main className="app-content">
           {children}
         </main>
+        {ayudaAbierta && <PanelDeAyuda actual={pantallaActual} roles={roles} onCerrar={cerrarAyuda} />}
       </div>
     </div>
   );
