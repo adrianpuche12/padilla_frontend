@@ -1,3 +1,6 @@
+# PRO-008: template de nginx. La imagen oficial reemplaza ${BACKEND_UPSTREAM} al arrancar
+# (envsubst sobre /etc/nginx/templates). Default en el Dockerfile: padilla-backend-dev:8080.
+# En cada servicio Swarm: --env BACKEND_UPSTREAM=<servicio-backend>:8080
 server {
     listen 80;
     root /usr/share/nginx/html;
@@ -5,7 +8,7 @@ server {
 
     # Proxy reverso al backend — evita mixed-content (frontend HTTPS, backend HTTP)
     location /api/ {
-        proxy_pass http://padilla-backend-dev:8080/api/;
+        proxy_pass http://${BACKEND_UPSTREAM}/api/;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -14,7 +17,7 @@ server {
     }
 
     location /actuator/ {
-        proxy_pass http://padilla-backend-dev:8080/actuator/;
+        proxy_pass http://${BACKEND_UPSTREAM}/actuator/;
         proxy_set_header Host $host;
     }
 
