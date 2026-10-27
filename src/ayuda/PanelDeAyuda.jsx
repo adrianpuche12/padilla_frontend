@@ -135,7 +135,7 @@ function Lista({ temas, videoDe, alElegir }) {
               <span className="ayuda__item-texto">
                 <span className="ayuda__item-titulo">{t.titulo}</span>
                 <span className="ayuda__item-resumen">
-                  {v ? `Video sin sonido · ${minutosYSegundos(v.duracion)} · ` : ''}{t.resumen}
+                  {v ? `Video · ${minutosYSegundos(v.duracion)} · ` : ''}{t.resumen}
                 </span>
               </span>
             </button>
@@ -166,12 +166,11 @@ function VideoDeAyuda({ video }) {
         src={`${CARPETA_DE_VIDEOS}${video.archivo}`}
         poster={video.portada ? `${CARPETA_DE_VIDEOS}${video.portada}` : undefined}
         controls
-        muted
         playsInline
         preload="none"
         onTimeUpdate={(e) => setSegundo(e.currentTarget.currentTime)}
       />
-      <p className="ayuda__nota">Video sin sonido · {minutosYSegundos(video.duracion)} · Datos de ejemplo, inventados.</p>
+      <p className="ayuda__nota">Video · {minutosYSegundos(video.duracion)} · Datos de ejemplo, inventados.</p>
       {pasos.length > 0 && (
         <ol className="ayuda__pasos-del-video">
           {pasos.map((p, i) => (

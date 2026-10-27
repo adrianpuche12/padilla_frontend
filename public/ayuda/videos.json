@@ -7,56 +7,56 @@
    "general"
   ],
   "permiso": null,
-  "duracion": 71.2,
+  "duracion": 89.6,
   "archivo": "propero-01.mp4",
   "portada": "propero-01.jpg",
   "pasos": [
    {
-    "segundo": 4.2,
+    "segundo": 4.4,
     "texto": "Propero se abre desde el navegador. En la pantalla de ingreso va el usuario que te dio la inmobiliaria."
    },
    {
-    "segundo": 11.3,
+    "segundo": 13.2,
     "texto": "Después, la contraseña. En este video la tapamos."
    },
    {
-    "segundo": 15.7,
+    "segundo": 18.9,
     "texto": "Si no te acordás la contraseña, está ¿Olvidaste tu contraseña?: te llega una temporal por mail."
    },
    {
-    "segundo": 22.2,
+    "segundo": 28.9,
     "texto": "Tocamos Ingresar."
    },
    {
-    "segundo": 26.7,
+    "segundo": 33.1,
     "texto": "Adentro, el sistema abre en el Dashboard. A la izquierda está el menú con cada sección."
    },
    {
-    "segundo": 32.9,
+    "segundo": 41.5,
     "texto": "El menú cambia según el rol: el inquilino y el proveedor solo ven Dashboard y Tickets."
    },
    {
-    "segundo": 39.4,
+    "segundo": 50,
     "texto": "Para ir a otra sección, se toca en el menú. Por ejemplo, Propiedades."
    },
    {
-    "segundo": 44.7,
+    "segundo": 57.2,
     "texto": "Arriba se ve el nombre de la sección, y a la derecha con qué usuario entraste."
    },
    {
-    "segundo": 50.7,
+    "segundo": 65.5,
     "texto": "Con la flecha de abajo del menú, el menú se achica y queda más lugar para las tablas."
    },
    {
-    "segundo": 57.1,
+    "segundo": 72.9,
     "texto": "Con la misma flecha vuelve a abrirse."
    },
    {
-    "segundo": 61.8,
+    "segundo": 77.4,
     "texto": "Al terminar, sobre todo en una computadora compartida, se toca Cerrar sesión."
    },
    {
-    "segundo": 67.6,
+    "segundo": 84.9,
     "texto": "Ya sabés entrar y moverte por Propero"
    }
   ]
@@ -69,37 +69,37 @@
    "dashboard"
   ],
   "permiso": null,
-  "duracion": 46.7,
+  "duracion": 64.4,
   "archivo": "propero-02.mp4",
   "portada": "propero-02.jpg",
   "pasos": [
    {
-    "segundo": 4.2,
+    "segundo": 4.4,
     "texto": "El Dashboard es la primera pantalla. Resume las consultas de interesados (los «leads»)."
    },
    {
-    "segundo": 10.8,
+    "segundo": 12.4,
     "texto": "Arriba, cuatro números: consultas de portales, del formulario de la web y las que entraron hoy por cada vía."
    },
    {
-    "segundo": 18,
+    "segundo": 23.1,
     "texto": "En Vendedores está cada vendedor y cuántas consultas tiene asignadas."
    },
    {
-    "segundo": 23.2,
+    "segundo": 30.6,
     "texto": "En Fuentes de Leads, por dónde llegan: portales, redes, el cartel en la propiedad, la web."
    },
    {
-    "segundo": 29.4,
+    "segundo": 39.4,
     "texto": "Abajo, las últimas consultas de portales: fecha, nombre, teléfono, fuente y vendedor."
    },
    {
-    "segundo": 36,
+    "segundo": 49.8,
     "texto": "Muestra las diez más nuevas. Estos datos son de ejemplo, inventados para la demostración."
    },
    {
-    "segundo": 43,
-    "texto": "Así se lee el Dashboard"
+    "segundo": 58.7,
+    "texto": "Listo: el Dashboard, leído de punta a punta"
    }
   ]
  },
@@ -111,45 +111,45 @@
    "users"
   ],
   "permiso": "ADMIN, MANAGER o SUPER_ADMIN",
-  "duracion": 61,
+  "duracion": 77.3,
   "archivo": "propero-03.mp4",
   "portada": "propero-03.jpg",
   "pasos": [
    {
-    "segundo": 4.4,
-    "texto": "En Usuarios están las personas de la inmobiliaria que trabajan en el panel. Los clientes van aparte, en Clientes."
+    "segundo": 4.8,
+    "texto": "Las personas de la inmobiliaria que trabajan en el panel están en Usuarios. Los clientes van aparte, en Clientes."
    },
    {
-    "segundo": 12.5,
+    "segundo": 14.3,
     "texto": "Cada uno ve y administra solo a los de rango menor: el SUPER ADMIN a todos, el MANAGER a los ADMIN."
    },
    {
-    "segundo": 19.3,
+    "segundo": 24.1,
     "texto": "Con este filtro se ve un rol por vez."
    },
    {
-    "segundo": 23.2,
+    "segundo": 28.7,
     "texto": "Con + Nuevo usuario se da de alta a alguien."
    },
    {
-    "segundo": 27.2,
+    "segundo": 34.2,
     "texto": "Se completan nombre, email, teléfono y el rol. El email es con el que va a entrar."
    },
    {
-    "segundo": 34.5,
+    "segundo": 42.2,
     "texto": "El rol solo ofrece los de rango menor al tuyo. Con este usuario de prueba (ADMIN) la lista sale vacía."
    },
    {
-    "segundo": 41.4,
+    "segundo": 52.7,
     "texto": "Al guardar, el sistema muestra una contraseña temporal y le manda un mail de bienvenida. Acá no lo guardamos."
    },
    {
-    "segundo": 48.8,
+    "segundo": 62.8,
     "texto": "En cada fila, los botones para editar, desactivar, reactivar, reenviar el acceso, resetear la contraseña o eliminar."
    },
    {
-    "segundo": 57.2,
-    "texto": "Así se administran los usuarios"
+    "segundo": 73.9,
+    "texto": "Usuarios en orden"
    }
   ]
  },
@@ -161,45 +161,45 @@
    "clients"
   ],
   "permiso": "ADMIN, MANAGER o SUPER_ADMIN",
-  "duracion": 83.9,
+  "duracion": 98.6,
   "archivo": "propero-04.mp4",
   "portada": "propero-04.jpg",
   "pasos": [
    {
-    "segundo": 4.2,
-    "texto": "En Clientes están los propietarios y los inquilinos, cada grupo en su tabla."
+    "segundo": 4.5,
+    "texto": "Propietarios e inquilinos: los dos grupos están en Clientes, cada uno en su tabla."
    },
    {
-    "segundo": 9.6,
+    "segundo": 12.4,
     "texto": "Cada fila muestra nombre, tipo de persona, documento, email, localidad y estado."
    },
    {
-    "segundo": 15.8,
+    "segundo": 21.2,
     "texto": "«Pendiente activación» quiere decir que todavía no entró por primera vez con su contraseña temporal."
    },
    {
-    "segundo": 23,
+    "segundo": 29.5,
     "texto": "Con el filtro de arriba se ve un solo tipo. Elegimos Inquilinos."
    },
    {
-    "segundo": 33.8,
+    "segundo": 40.6,
     "texto": "Para dar de alta a alguien, + Nuevo cliente."
    },
    {
-    "segundo": 51.1,
+    "segundo": 53.9,
     "texto": "Obligatorios: nombre o razón social, email, tipo de cliente (propietario o inquilino) y tipo de persona."
    },
    {
-    "segundo": 62.9,
+    "segundo": 66.7,
     "texto": "Después, si los tenés: documento, CUIT, domicilio, localidad, provincia, condición frente al IVA y notas."
    },
    {
-    "segundo": 71.7,
+    "segundo": 81.8,
     "texto": "Al guardar, el cliente queda con acceso al sistema: se ve su contraseña temporal y le llega un mail. Acá no lo guardamos."
    },
    {
-    "segundo": 80.1,
-    "texto": "Así se buscan y se cargan clientes"
+    "segundo": 93.4,
+    "texto": "Ya podés buscar y cargar clientes"
    }
   ]
  },
@@ -211,37 +211,37 @@
    "clients"
   ],
   "permiso": "ADMIN, MANAGER o SUPER_ADMIN",
-  "duracion": 45.4,
+  "duracion": 63,
   "archivo": "propero-05.mp4",
   "portada": "propero-05.jpg",
   "pasos": [
    {
-    "segundo": 4.2,
+    "segundo": 4.7,
     "texto": "Cada cliente tiene sus botones al final de la fila. El lápiz es para editar."
    },
    {
-    "segundo": 9.8,
+    "segundo": 12.6,
     "texto": "Se abre el mismo formulario del alta, con los datos cargados. Se corrige lo que haga falta y se guarda."
    },
    {
-    "segundo": 17.4,
+    "segundo": 22,
     "texto": "Esta vez no cambiamos nada: Cancelar."
    },
    {
-    "segundo": 21.1,
+    "segundo": 27.7,
     "texto": "El círculo tachado es Desactivar: el cliente deja de poder entrar, pero no se borra nada."
    },
    {
-    "segundo": 27.9,
+    "segundo": 37.6,
     "texto": "Pide confirmación y avisa que no va a poder ingresar. Para hacerlo, se toca Desactivar."
    },
    {
-    "segundo": 34.1,
+    "segundo": 47.1,
     "texto": "Queda Inactivo y en su fila aparece el botón Reactivar, que le devuelve el acceso. Acá tocamos Cancelar."
    },
    {
-    "segundo": 41.9,
-    "texto": "Así se editan, desactivan y reactivan clientes"
+    "segundo": 57.9,
+    "texto": "Datos corregidos, sin borrar a nadie"
    }
   ]
  },
@@ -253,41 +253,41 @@
    "providers"
   ],
   "permiso": "ADMIN, MANAGER o SUPER_ADMIN",
-  "duracion": 55.2,
+  "duracion": 71,
   "archivo": "propero-06.mp4",
   "portada": "propero-06.jpg",
   "pasos": [
    {
     "segundo": 4.4,
-    "texto": "En Proveedores están los que hacen los arreglos: plomeros, pintores, electricistas, gasistas."
+    "texto": "Plomeros, pintores, electricistas, gasistas: los que hacen los arreglos se cargan en Proveedores."
    },
    {
-    "segundo": 11,
+    "segundo": 14.4,
     "texto": "Con el filtro se ve una sola especialidad."
    },
    {
-    "segundo": 14.8,
+    "segundo": 18.9,
     "texto": "Con + Nuevo proveedor se carga uno. Lo más importante: nombre, email y especialidad."
    },
    {
-    "segundo": 27.5,
+    "segundo": 30.8,
     "texto": "Al guardar, el proveedor recibe acceso para ver y actualizar sus tickets. Acá no lo guardamos."
    },
    {
-    "segundo": 33.8,
+    "segundo": 39.9,
     "texto": "En cada fila: editar, desactivar (deja de recibir trabajos) y eliminar."
    },
    {
-    "segundo": 39.5,
+    "segundo": 48.9,
     "texto": "Eliminar lo borra para siempre: pide confirmación. Si solo dejó de trabajar con ustedes, conviene desactivarlo."
    },
    {
-    "segundo": 47,
+    "segundo": 59.7,
     "texto": "Esta vez, Cancelar: no borramos nada."
    },
    {
-    "segundo": 51.6,
-    "texto": "Así se manejan los proveedores"
+    "segundo": 67.2,
+    "texto": "Proveedores al día"
    }
   ]
  },
@@ -299,29 +299,29 @@
    "properties"
   ],
   "permiso": "ADMIN, MANAGER o SUPER_ADMIN",
-  "duracion": 41.1,
+  "duracion": 50.8,
   "archivo": "propero-07.mp4",
   "portada": "propero-07.jpg",
   "pasos": [
    {
-    "segundo": 4.4,
-    "texto": "En Propiedades está toda la cartera: dirección, tipo, metros, ambientes, estado y fecha de alta."
+    "segundo": 4.6,
+    "texto": "Toda la cartera de la inmobiliaria vive en Propiedades: dirección, tipo, metros, ambientes, estado y fecha de alta."
    },
    {
-    "segundo": 11.4,
+    "segundo": 16.7,
     "texto": "Con el filtro se ve un solo estado. Elegimos Disponible."
    },
    {
-    "segundo": 21.7,
+    "segundo": 26.8,
     "texto": "El ojo de cada fila abre el detalle: ubicación, datos de la propiedad y estado comercial."
    },
    {
-    "segundo": 28.2,
+    "segundo": 35.6,
     "texto": "El estado comercial dice si está en alquiler o en venta, y quién es el productor de cada operación."
    },
    {
-    "segundo": 37.4,
-    "texto": "Así se recorre la cartera"
+    "segundo": 46.8,
+    "texto": "Con eso recorrés toda la cartera"
    }
   ]
  },
@@ -333,49 +333,49 @@
    "properties"
   ],
   "permiso": "ADMIN, MANAGER o SUPER_ADMIN",
-  "duracion": 88.3,
+  "duracion": 93,
   "archivo": "propero-08.mp4",
   "portada": "propero-08.jpg",
   "pasos": [
    {
-    "segundo": 4.3,
+    "segundo": 4.6,
     "texto": "Para cargar una propiedad nueva, + Nueva propiedad."
    },
    {
-    "segundo": 14.1,
+    "segundo": 14.3,
     "texto": "La dirección es obligatoria. Las usamos inventadas: esta es de ejemplo."
    },
    {
-    "segundo": 26.7,
+    "segundo": 27.2,
     "texto": "También son obligatorios el tipo y el propietario, que tiene que estar cargado antes en Clientes."
    },
    {
-    "segundo": 38.1,
+    "segundo": 38.6,
     "texto": "Abajo van el estado de alquiler y de venta, los productores y la fecha de alta."
    },
    {
-    "segundo": 43.7,
+    "segundo": 46.6,
     "texto": "Tocamos Guardar."
    },
    {
-    "segundo": 49.1,
+    "segundo": 52,
     "texto": "La propiedad nueva ya está en la lista."
    },
    {
-    "segundo": 53.9,
+    "segundo": 57,
     "texto": "Con el lápiz se edita. Cambiamos los metros cuadrados y guardamos."
    },
    {
-    "segundo": 68.4,
+    "segundo": 70.5,
     "texto": "Si deja de estar en la cartera, se desactiva: queda inactiva pero no se borra."
    },
    {
-    "segundo": 75.9,
+    "segundo": 78.2,
     "texto": "Y se puede reactivar cuando vuelva."
    },
    {
-    "segundo": 84.9,
-    "texto": "Así se carga y se mantiene una propiedad"
+    "segundo": 87.5,
+    "texto": "Propiedad cargada, corregida y de nuevo activa"
    }
   ]
  },
@@ -387,29 +387,29 @@
    "contracts"
   ],
   "permiso": "ADMIN, MANAGER o SUPER_ADMIN",
-  "duracion": 40.8,
+  "duracion": 49.9,
   "archivo": "propero-09.mp4",
   "portada": "propero-09.jpg",
   "pasos": [
    {
-    "segundo": 4.6,
-    "texto": "En Contratos están los alquileres: propiedad, propietario, inquilino, fechas, monto y estado."
+    "segundo": 4.3,
+    "texto": "¿Buscás un alquiler? Contratos muestra propiedad, propietario, inquilino, fechas, monto y estado."
    },
    {
-    "segundo": 11.4,
+    "segundo": 15.2,
     "texto": "Con el filtro se ven solo los activos, los vencidos o los rescindidos."
    },
    {
-    "segundo": 19.1,
+    "segundo": 23.2,
     "texto": "El ojo abre el detalle: las partes, los datos del contrato y el historial de períodos."
    },
    {
-    "segundo": 25.3,
+    "segundo": 32.6,
     "texto": "En el historial de períodos se ve cómo fue cambiando el monto a lo largo del contrato."
    },
    {
-    "segundo": 37.2,
-    "texto": "Así se consultan los contratos"
+    "segundo": 45.2,
+    "texto": "Contratos a la vista, con su historia"
    }
   ]
  },
@@ -421,49 +421,49 @@
    "contracts"
   ],
   "permiso": "ADMIN, MANAGER o SUPER_ADMIN",
-  "duracion": 90.8,
+  "duracion": 96.8,
   "archivo": "propero-10.mp4",
   "portada": "propero-10.jpg",
   "pasos": [
    {
-    "segundo": 4.2,
+    "segundo": 4.6,
     "texto": "Para cargar un contrato, + Nuevo contrato. La propiedad y las dos partes tienen que estar cargadas antes."
    },
    {
-    "segundo": 19.9,
+    "segundo": 20,
     "texto": "Se elige la propiedad, el propietario y el inquilino. Usamos la propiedad de ejemplo."
    },
    {
-    "segundo": 30,
+    "segundo": 30.5,
     "texto": "Después, las fechas de inicio y de fin, y el monto inicial. Son obligatorios."
    },
    {
-    "segundo": 40.3,
+    "segundo": 40.5,
     "texto": "Opcionales: tipo de contrato, moneda, honorarios, gastos administrativos, productor y observaciones."
    },
    {
-    "segundo": 47.6,
+    "segundo": 50.7,
     "texto": "Guardar."
    },
    {
-    "segundo": 55.2,
+    "segundo": 56.2,
     "texto": "El contrato nuevo aparece en la lista, Activo."
    },
    {
-    "segundo": 59.7,
+    "segundo": 62.6,
     "texto": "Con el lápiz se corrige. Por ejemplo, el monto."
    },
    {
-    "segundo": 71.6,
+    "segundo": 74.8,
     "texto": "Si el contrato termina antes de tiempo, se rescinde. Ojo: no se puede deshacer."
    },
    {
-    "segundo": 82.3,
+    "segundo": 85.3,
     "texto": "Queda como Rescindido, con su historia intacta."
    },
    {
-    "segundo": 87.3,
-    "texto": "Así se carga y se cierra un contrato"
+    "segundo": 91.5,
+    "texto": "Del alta a la rescisión, en un solo lugar"
    }
   ]
  },
@@ -475,45 +475,45 @@
    "tickets"
   ],
   "permiso": null,
-  "duracion": 64.2,
+  "duracion": 84.2,
   "archivo": "propero-11.mp4",
   "portada": "propero-11.jpg",
   "pasos": [
    {
-    "segundo": 4.3,
+    "segundo": 4.5,
     "texto": "Un ticket es un pedido de arreglo. Lo carga el inquilino desde su usuario y acá se sigue hasta que se cierra."
    },
    {
-    "segundo": 12,
+    "segundo": 13.3,
     "texto": "Estados: Abierta (recién cargado), En proceso (con proveedor), Resuelta, Cerrada o Rechazada."
    },
    {
-    "segundo": 18.3,
+    "segundo": 25.2,
     "texto": "Con el filtro se ve un solo estado. Elegimos Abierta: son los que esperan proveedor."
    },
    {
-    "segundo": 24.6,
+    "segundo": 35,
     "texto": "El título de cada ticket abre el detalle."
    },
    {
-    "segundo": 28.4,
+    "segundo": 39.9,
     "texto": "Arriba: estado, categoría, prioridad, propiedad y proveedor. Debajo, lo que escribió el inquilino."
    },
    {
-    "segundo": 35.1,
+    "segundo": 50.7,
     "texto": "Más abajo, el historial de proveedores: quién lo tuvo y cuándo cambió."
    },
    {
-    "segundo": 40.2,
+    "segundo": 59,
     "texto": "Y los comentarios. Si se tilda Interno, el inquilino no lo ve: queda solo para la inmobiliaria."
    },
    {
-    "segundo": 53.5,
+    "segundo": 72.4,
     "texto": "El comentario queda guardado con la fecha y marcado como interno."
    },
    {
-    "segundo": 60.9,
-    "texto": "Así se sigue un ticket"
+    "segundo": 79.9,
+    "texto": "Cada ticket, seguido de cerca"
    }
   ]
  },
@@ -525,45 +525,45 @@
    "tickets"
   ],
   "permiso": "ADMIN, MANAGER o SUPER_ADMIN",
-  "duracion": 54.6,
+  "duracion": 68.8,
   "archivo": "propero-12.mp4",
   "portada": "propero-12.jpg",
   "pasos": [
    {
-    "segundo": 4.4,
+    "segundo": 4.5,
     "texto": "Filtramos los tickets Abiertos: los que todavía no tienen a nadie."
    },
    {
-    "segundo": 9.6,
+    "segundo": 10.6,
     "texto": "En la fila, Asignar."
    },
    {
-    "segundo": 13.9,
+    "segundo": 14.9,
     "texto": "Se elige el proveedor de la lista."
    },
    {
-    "segundo": 18.1,
+    "segundo": 20.7,
     "texto": "Con Asignar, el ticket pasa a En proceso y el proveedor lo ve en su usuario."
    },
    {
-    "segundo": 23.8,
+    "segundo": 28.5,
     "texto": "Para cambiar de proveedor se usa el mismo botón: el sistema pide confirmar el cambio y lo anota en el historial del ticket."
    },
    {
-    "segundo": 32.4,
+    "segundo": 38.6,
     "texto": "En este video no lo confirmamos: Cancelar."
    },
    {
-    "segundo": 36.2,
+    "segundo": 44,
     "texto": "Si el pedido no corresponde, en un ticket abierto está Rechazar. Pide el motivo, que ve el inquilino."
    },
    {
-    "segundo": 45.8,
+    "segundo": 53.4,
     "texto": "Rechazar no tiene vuelta atrás. En este video no lo confirmamos: Cancelar."
    },
    {
-    "segundo": 51.3,
-    "texto": "Así se asigna o se rechaza un ticket"
+    "segundo": 62.4,
+    "texto": "Asignar o rechazar: dos botones en la fila"
    }
   ]
  },
@@ -575,53 +575,53 @@
    "reservas"
   ],
   "permiso": "ADMIN, MANAGER o SUPER_ADMIN",
-  "duracion": 94.1,
+  "duracion": 111.5,
   "archivo": "propero-13.mp4",
   "portada": "propero-13.jpg",
   "pasos": [
    {
-    "segundo": 4.3,
-    "texto": "En Reservas se cargan las reservas de alquiler. Con esos datos el sistema arma el recibo y el contrato."
+    "segundo": 4.5,
+    "texto": "Cuando alguien reserva un alquiler, se carga en Reservas. Con esos datos el sistema arma el recibo y el contrato."
    },
    {
-    "segundo": 11.2,
+    "segundo": 14.4,
     "texto": "+ Nueva Reserva."
    },
    {
-    "segundo": 15.3,
+    "segundo": 18.3,
     "texto": "Arriba se puede subir una foto del DNI para que se completen solos los datos. En este video los escribimos a mano."
    },
    {
-    "segundo": 23.1,
+    "segundo": 28.6,
     "texto": "Datos del inquilino: nombre, apellido, DNI y domicilio actual son obligatorios."
    },
    {
-    "segundo": 44,
+    "segundo": 49.2,
     "texto": "Datos de la operación: la propiedad y el monto de la reserva. Debajo del monto aparece escrito en letras."
    },
    {
-    "segundo": 56.3,
+    "segundo": 61.7,
     "texto": "Se tildan las garantías que presenta. Con «Propietaria», cada garante lleva la descripción del bien."
    },
    {
-    "segundo": 63.1,
+    "segundo": 70.9,
     "texto": "En Garantes se cargan uno o más, con + Agregar garante."
    },
    {
-    "segundo": 68,
+    "segundo": 78.4,
     "texto": "Locador / Propietario: lo completa la inmobiliaria y va al contrato."
    },
    {
-    "segundo": 76,
+    "segundo": 86.3,
     "texto": "Al final, datos que quedan solo en el sistema: cuántas personas van a vivir y si hay co-inquilino."
    },
    {
-    "segundo": 82.9,
+    "segundo": 95.7,
     "texto": "Con Guardar reserva queda en la lista como Pendiente, con sus tres documentos. Esta de ejemplo no la guardamos."
    },
    {
-    "segundo": 90.6,
-    "texto": "Así se carga una reserva"
+    "segundo": 106.8,
+    "texto": "Ese es todo el formulario de la reserva"
    }
   ]
  },
@@ -633,7 +633,7 @@
    "reservas"
   ],
   "permiso": "ADMIN, MANAGER o SUPER_ADMIN",
-  "duracion": 56.4,
+  "duracion": 74,
   "archivo": "propero-14.mp4",
   "portada": "propero-14.jpg",
   "pasos": [
@@ -642,36 +642,36 @@
     "texto": "Cada reserva tiene tres documentos que se arman solos con lo que se cargó."
    },
    {
-    "segundo": 9.8,
+    "segundo": 10,
     "texto": "FC1 es el recibo de la reserva; FC10, la constancia de entrega de copia; CTR, el contrato de locación."
    },
    {
-    "segundo": 17,
+    "segundo": 23.2,
     "texto": "Se abre la vista del documento. En este video lo tapamos porque lleva los datos de la inmobiliaria."
    },
    {
-    "segundo": 24.2,
+    "segundo": 30.9,
     "texto": "Arriba se pasa de un documento a otro, sin cerrar."
    },
    {
-    "segundo": 30.5,
+    "segundo": 37,
     "texto": "En el contrato, lo que falta completar aparece marcado en rojo para revisarlo antes de imprimir."
    },
    {
-    "segundo": 37.3,
+    "segundo": 44.6,
     "texto": "Imprimir / PDF abre la impresión del navegador: se imprime o se elige «Guardar como PDF»."
    },
    {
-    "segundo": 43.4,
+    "segundo": 54.3,
     "texto": "El tacho borra la reserva. Pide confirmación y no se puede deshacer."
    },
    {
-    "segundo": 48.3,
+    "segundo": 61.3,
     "texto": "Esta es una reserva de ejemplo: no la borramos. Cancelar."
    },
    {
-    "segundo": 53.1,
-    "texto": "Así se usan los documentos de la reserva"
+    "segundo": 68.1,
+    "texto": "Recibo, copia y contrato, listos para imprimir"
    }
   ]
  }

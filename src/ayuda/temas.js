@@ -3,7 +3,7 @@
  *
  * - pantalla: la ruta donde se usa ('general' = vale para todo el sistema).
  * - roles: quiénes lo pueden hacer (null = todos los que entran).
- * - video: id del video sin voz en /ayuda/videos.json (opcional; si falta, el tema queda solo con texto).
+ * - video: id del video con voz en /ayuda/videos.json (opcional; si falta, el tema queda solo con texto).
  * - pasos: lo que se hace, en orden. consejos: «Tené en cuenta».
  *
  * Los videos se grabaron sobre el ambiente de desarrollo con datos inventados.
