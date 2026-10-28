@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import WidgetBoard from '../components/WidgetBoard';
 import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout';
 import dataService from '../services/dataService';
@@ -74,6 +75,9 @@ function Dashboard() {
               : 'Has iniciado sesion correctamente en el sistema.'}
           </p>
         </div>
+
+        {/* PRO-105: widgets configurables por usuario (Widget Registry) */}
+        <WidgetBoard />
 
         {isLoading ? (
           <div className="loading-container">
