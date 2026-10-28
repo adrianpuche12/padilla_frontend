@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import NotificationBell from './NotificationBell';
 import { NavLink, useLocation } from 'react-router-dom';
 import PanelDeAyuda from '../ayuda/PanelDeAyuda';
 import { useAuth } from '../context/AuthContext';
@@ -122,6 +123,7 @@ function Layout({ children, title }) {
           </button>
           <h1 className="app-header-title">{title}</h1>
           <div className="app-header-right">
+            <NotificationBell />
             <NavLink to="/profile" className="header-profile-link" title="Mi perfil" style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'inherit', textDecoration: 'none' }}>
               <div className="user-avatar">{getInitials(user?.username)}</div>
               <span className="header-username">{user?.username}</span>
