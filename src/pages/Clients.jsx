@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout';
 import ClientForm from '../components/ClientForm';
 import clientService from '../services/clientService';
+import Pagination from '../components/Pagination';
+import usePagedList from '../hooks/usePagedList';
 import './Clients.css';
 
 const ROLE_LEVEL = { SUPER_ADMIN: 0, MANAGER: 1, ADMIN: 2, OWNER: 3, TENANT: 3, PROVIDER: 3 };
@@ -20,10 +22,12 @@ const PERSONA_LABELS = {
 
 function Clients() {
   const { roles, isSuperAdmin } = useAuth();
-  const [clients, setClients] = useState([]);
   const [filteredRole, setFilteredRole] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // PRO-094: paginacion y busqueda del lado del servidor (antes cargaba los 2.759 clientes juntos)
+  const {
+    items: clients, data: pageData, page, setPage, q, setQ, loading: isLoading, error, setError,
+    reload: loadClients, updateItem,
+  } = usePagedList((params) => clientService.getClientsPage(params), { size: 25, filters: { role: filteredRole || undefined } });
   const [showForm, setShowForm] = useState(false);
   const [editingClient, setEditingClient] = useState(null);
   const [formLoading, setFormLoading] = useState(false);
@@ -42,21 +46,6 @@ function Clients() {
     return targetLevel !== undefined && callerLevel < targetLevel;
   };
 
-  const loadClients = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const data = await clientService.getClients(filteredRole || null);
-      // Excluir proveedores — tienen su propia vista en /providers
-      setClients(data.filter(c => c.role !== 'PROVIDER'));
-    } catch (err) {
-      setError('Error al cargar los clientes');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => { loadClients(); }, [filteredRole]);
 
   const handleCreate = async (data) => {
     setFormLoading(true);
@@ -99,7 +88,7 @@ function Clients() {
     try {
       await clientService.deactivateClient(client.id);
       setConfirmDeactivate(null);
-      setClients(prev => prev.map(c => c.id === client.id ? { ...c, active: false } : c));
+      updateItem(client.id, { active: false });
     } catch (err) {
       setError('Error al desactivar el cliente');
     }
@@ -109,7 +98,7 @@ function Clients() {
     try {
       await clientService.reactivateClient(client.id);
       setConfirmReactivate(null);
-      setClients(prev => prev.map(c => c.id === client.id ? { ...c, active: true } : c));
+      updateItem(client.id, { active: true });
     } catch (err) {
       setError('Error al reactivar el cliente');
     }
@@ -240,6 +229,15 @@ function Clients() {
             <option value="TENANT">Inquilinos</option>
           </select>
 
+          <input
+            type="search"
+            className="role-filter"
+            placeholder="Buscar por nombre, email, DNI o CUIT"
+            value={q}
+            onChange={e => setQ(e.target.value)}
+            aria-label="Buscar clientes"
+          />
+
           <button className="btn-primary" onClick={() => setShowForm(true)}>
             + Nuevo cliente
           </button>
@@ -265,6 +263,8 @@ function Clients() {
           <>
             {renderSection('OWNER',  'Propietarios', clients)}
             {renderSection('TENANT', 'Inquilinos',   clients)}
+            <Pagination page={page} totalPages={pageData.totalPages} totalElements={pageData.totalElements}
+                        onChange={setPage} disabled={isLoading} />
           </>
         )}
 

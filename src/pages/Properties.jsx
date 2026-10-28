@@ -3,6 +3,8 @@ import Layout from '../components/Layout';
 import PropertyForm from '../components/PropertyForm';
 import PropertyDetailModal from '../components/PropertyDetailModal';
 import propertyService from '../services/propertyService';
+import Pagination from '../components/Pagination';
+import usePagedList from '../hooks/usePagedList';
 import userService from '../services/userService';
 import './Properties.css';
 
@@ -15,30 +17,19 @@ const TYPE_LABEL = {
 const ALL_STATUSES = ['AVAILABLE', 'RENTED', 'FOR_SALE', 'MAINTENANCE'];
 
 function Properties() {
-  const [properties, setProperties] = useState([]);
   const [owners, setOwners] = useState([]);
   const [filteredStatus, setFilteredStatus] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // PRO-094: paginacion y busqueda del lado del servidor (antes cargaba todas las propiedades)
+  const {
+    items: properties, data: pageData, page, setPage, q, setQ, loading: isLoading, error, setError,
+    reload: loadProperties, updateItem,
+  } = usePagedList((params) => propertyService.getPropertiesPage(params), { size: 25, filters: { status: filteredStatus || undefined } });
   const [showForm, setShowForm] = useState(false);
   const [editingProperty, setEditingProperty] = useState(null);
   const [viewingProperty, setViewingProperty] = useState(null);
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState(null);
   const [confirmDeactivate, setConfirmDeactivate] = useState(null);
-
-  const loadProperties = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const data = await propertyService.getProperties(filteredStatus || null);
-      setProperties(data);
-    } catch (err) {
-      setError('Error al cargar las propiedades');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const loadOwners = async () => {
     try {
@@ -49,7 +40,6 @@ function Properties() {
     }
   };
 
-  useEffect(() => { loadProperties(); }, [filteredStatus]);
   useEffect(() => { loadOwners(); }, []);
 
   const getOwnerName = (id) => {
@@ -83,7 +73,8 @@ function Properties() {
     try {
       await propertyService.deactivateProperty(property.id);
       setConfirmDeactivate(null);
-      setProperties(prev => prev.map(p => p.id === property.id ? { ...p, active: false, status: 'MAINTENANCE' } : p));
+      // PRO-043: desactivar ya no cambia el estado de la propiedad
+      updateItem(property.id, { active: false });
     } catch (err) {
       setError('Error al desactivar la propiedad');
     }
@@ -92,7 +83,7 @@ function Properties() {
   const handleReactivate = async (property) => {
     try {
       await propertyService.reactivateProperty(property.id);
-      setProperties(prev => prev.map(p => p.id === property.id ? { ...p, active: true, status: 'AVAILABLE' } : p));
+      updateItem(property.id, { active: true, status: property.status === 'MAINTENANCE' ? 'AVAILABLE' : property.status });
     } catch (err) {
       setError('Error al reactivar la propiedad');
     }
@@ -106,6 +97,8 @@ function Properties() {
             <option value="">Todos los estados</option>
             {ALL_STATUSES.map(s => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}
           </select>
+          <input type="search" className="status-filter" placeholder="Buscar por dirección o ciudad"
+                 value={q} onChange={e => setQ(e.target.value)} aria-label="Buscar propiedades" />
           <button className="btn-primary" onClick={() => setShowForm(true)}>+ Nueva propiedad</button>
         </div>
 
@@ -156,6 +149,8 @@ function Properties() {
                 ))}
               </tbody>
             </table>
+            <Pagination page={page} totalPages={pageData.totalPages} totalElements={pageData.totalElements}
+                        onChange={setPage} disabled={isLoading} />
           </div>
         )}
       </div>
