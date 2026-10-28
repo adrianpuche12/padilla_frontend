@@ -4,6 +4,9 @@ import { useAuth } from '../context/AuthContext';
 import ticketService from '../services/ticketService';
 import userService from '../services/userService';
 import propertyService from '../services/propertyService';
+import meService from '../services/meService';
+import { errorMessage } from '../services/api';
+import { statusActions } from './ticketActions';
 import './Tickets.css';
 
 const STATUS_LABEL = {
@@ -12,6 +15,7 @@ const STATUS_LABEL = {
   RESUELTA: 'Resuelta',
   CERRADA: 'Cerrada',
   RECHAZADA: 'Rechazada',
+  CANCELADA: 'Cancelada',
 };
 
 const CATEGORY_LABEL = {
@@ -20,20 +24,28 @@ const CATEGORY_LABEL = {
   PINTURA: 'Pintura',
   CERRAJERIA: 'Cerrajeria',
   GAS: 'Gas',
+  ALBANILERIA: 'Albañilería',
+  JARDINERIA: 'Jardinería',
   OTRO: 'Otro',
 };
 
 const PRIORITY_LABEL = { BAJA: 'Baja', NORMAL: 'Normal', URGENTE: 'Urgente' };
 
-const ALL_STATUSES = ['ABIERTA', 'EN_PROCESO', 'RESUELTA', 'CERRADA', 'RECHAZADA'];
+const ALL_STATUSES = ['ABIERTA', 'EN_PROCESO', 'RESUELTA', 'CERRADA', 'RECHAZADA', 'CANCELADA'];
 
-const CATEGORIES = ['PLOMERIA', 'ELECTRICIDAD', 'PINTURA', 'CERRAJERIA', 'GAS', 'OTRO'];
+const CATEGORIES = ['PLOMERIA', 'ELECTRICIDAD', 'PINTURA', 'CERRAJERIA', 'GAS', 'ALBANILERIA', 'JARDINERIA', 'OTRO'];
 const PRIORITIES = ['BAJA', 'NORMAL', 'URGENTE'];
 
 function Tickets() {
-  const { hasRole } = useAuth();
+  const { hasRole, getAccessToken } = useAuth();
   const isTenant = hasRole('TENANT') || hasRole('tenant');
+  const isProvider = hasRole('PROVIDER') || hasRole('provider');
+  const isOwner = hasRole('OWNER') || hasRole('owner');
   const isAdmin = hasRole('SUPER_ADMIN') || hasRole('MANAGER') || hasRole('ADMIN');
+  const userId = (() => {
+    try { return JSON.parse(atob(getAccessToken().split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).sub; } catch { return null; }
+  })();
+  const canCreate = isTenant || isAdmin;
 
   const [tickets, setTickets] = useState([]);
   const [providers, setProviders] = useState([]);
@@ -66,6 +78,11 @@ function Tickets() {
   // Confirm provider change modal
   const [confirmChange, setConfirmChange] = useState(null);
 
+  // PRO-092: cambio de estado (con motivo cuando corresponde)
+  const [statusChange, setStatusChange] = useState(null);
+  const [statusReason, setStatusReason] = useState('');
+  const [statusLoading, setStatusLoading] = useState(false);
+
   // Reject modal
   const [rejectTicket, setRejectTicket] = useState(null);
   const [rejectReason, setRejectReason] = useState('');
@@ -84,11 +101,13 @@ function Tickets() {
     }
   };
 
+  // PRO-092: cada rol carga solo lo que puede ver (antes el inquilino pedia /api/users, recibia 403
+  // y se quedaba sin propiedades: no podia crear tickets).
   const loadReferenceData = async () => {
     try {
       const [provData, propData] = await Promise.all([
-        userService.getUsers('PROVIDER'),
-        propertyService.getProperties(),
+        isAdmin ? userService.getUsers('PROVIDER') : Promise.resolve([]),
+        isAdmin ? propertyService.getProperties() : (isTenant || isOwner ? meService.getMyProperties() : Promise.resolve([])),
       ]);
       setProviders(provData);
       setProperties(propData);
@@ -117,7 +136,7 @@ function Tickets() {
       setCreateForm({ title: '', description: '', category: 'PLOMERIA', priority: 'NORMAL', propertyId: '' });
       loadTickets();
     } catch (err) {
-      setCreateError(err.response?.data?.message || 'Error al crear el ticket');
+      setCreateError(errorMessage(err, 'Error al crear el ticket'));
     } finally {
       setCreateLoading(false);
     }
@@ -151,8 +170,9 @@ function Tickets() {
       setComments(prev => [...prev, comment]);
       setNewComment('');
       setIsInternal(false);
-    } catch {
-      // ignorar silenciosamente
+    } catch (err) {
+      // p. ej. el backend rechaza mensajes con telefonos o emails (PRO-064)
+      setError(errorMessage(err, 'No se pudo enviar el comentario'));
     } finally {
       setCommentSending(false);
     }
@@ -166,8 +186,8 @@ function Tickets() {
       setAssignTicket(null);
       setAssignProviderId('');
       setConfirmChange(null);
-    } catch {
-      // ignorar
+    } catch (err) {
+      setError(errorMessage(err, 'No se pudo asignar el proveedor'));
     } finally {
       setAssignLoading(false);
     }
@@ -190,11 +210,34 @@ function Tickets() {
       setTickets(prev => prev.map(t => t.id === updated.id ? updated : t));
       setRejectTicket(null);
       setRejectReason('');
-    } catch {
-      // ignorar
+    } catch (err) {
+      setError(errorMessage(err, 'No se pudo rechazar el ticket'));
     } finally {
       setRejectLoading(false);
     }
+  };
+
+  const doStatusChange = async (ticket, action, reason) => {
+    setStatusLoading(true);
+    try {
+      const updated = await ticketService.updateStatus(ticket.id, action.to, reason);
+      setTickets(prev => prev.map(t => t.id === updated.id ? updated : t));
+      if (selectedTicket?.id === updated.id) setSelectedTicket(updated);
+      setStatusChange(null);
+      setStatusReason('');
+    } catch (err) {
+      setError(errorMessage(err, 'No se pudo cambiar el estado'));
+    } finally {
+      setStatusLoading(false);
+    }
+  };
+
+  const onStatusAction = (ticket, action) => {
+    if (action.reason) {
+      setStatusChange({ ticket, action });
+      return;
+    }
+    doStatusChange(ticket, action);
   };
 
   const getPropertyAddress = (id) => properties.find(p => p.id === id)?.address || id?.slice(0, 8) + '...';
@@ -211,7 +254,7 @@ function Tickets() {
             <option value="">Todos los estados</option>
             {ALL_STATUSES.map(s => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}
           </select>
-          {isTenant && (
+          {canCreate && (
             <button className="btn-primary" onClick={() => setShowCreateForm(true)}>+ Nuevo ticket</button>
           )}
         </div>
@@ -269,12 +312,18 @@ function Tickets() {
                     <td data-label="Creado">{formatDate(t.createdAt)}</td>
                     <td data-label="Acciones">
                       <div className="row-actions">
-                        {(t.status === 'ABIERTA' || t.status === 'EN_PROCESO') && (
+                        {statusActions(t, { isAdmin, isTenant, isProvider, userId }).map(a => (
+                          <button key={a.to} className={`action-btn${a.danger ? ' danger' : ''}`} disabled={statusLoading}
+                                  onClick={() => onStatusAction(t, a)}>
+                            {a.label}
+                          </button>
+                        ))}
+                        {isAdmin && (t.status === 'ABIERTA' || t.status === 'EN_PROCESO') && (
                           <button className="action-btn" onClick={() => { setAssignTicket(t); setAssignProviderId(t.providerId || ''); }} title="Asignar proveedor">
                             Asignar
                           </button>
                         )}
-                        {t.status === 'ABIERTA' && (
+                        {isAdmin && t.status === 'ABIERTA' && (
                           <button className="action-btn danger" onClick={() => setRejectTicket(t)} title="Rechazar">
                             Rechazar
                           </button>
@@ -335,6 +384,7 @@ function Tickets() {
               </div>
               <div className="form-field">
                 <label>Propiedad</label>
+                {isAdmin && <p className="text-muted" style={{ fontSize: 'var(--font-size-sm)' }}>El ticket queda a nombre del inquilino del contrato vigente.</p>}
                 {properties.length === 0 ? (
                   <p className="no-property-msg">No tenés una propiedad asignada. Contactá al administrador.</p>
                 ) : properties.length === 1 ? (
@@ -432,10 +482,12 @@ function Tickets() {
                     rows={3}
                   />
                   <div className="comment-actions">
-                    <label className="internal-check">
-                      <input type="checkbox" checked={isInternal} onChange={e => setIsInternal(e.target.checked)} />
-                      Interno
-                    </label>
+                    {isAdmin && (
+                      <label className="internal-check">
+                        <input type="checkbox" checked={isInternal} onChange={e => setIsInternal(e.target.checked)} />
+                        Interno
+                      </label>
+                    )}
                     <button className="btn-primary" onClick={handleSendComment} disabled={commentSending || !newComment.trim()}>
                       {commentSending ? 'Enviando...' : 'Comentar'}
                     </button>
@@ -498,6 +550,30 @@ function Tickets() {
               <button className="btn-secondary" onClick={() => setConfirmChange(null)}>Cancelar</button>
               <button className="btn-primary" onClick={() => doAssign(confirmChange.ticket.id, confirmChange.newProviderId)} disabled={assignLoading}>
                 {assignLoading ? 'Cambiando...' : 'Confirmar cambio'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PRO-092: modal de motivo para cancelar */}
+      {statusChange && (
+        <div className="modal-overlay" onClick={() => setStatusChange(null)}>
+          <div className="modal confirm-modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>{statusChange.action.label}</h2>
+              <button className="modal-close" onClick={() => setStatusChange(null)}>x</button>
+            </div>
+            <div className="confirm-body">
+              <p>Ticket: <strong>{statusChange.ticket.title}</strong></p>
+              <textarea value={statusReason} onChange={e => setStatusReason(e.target.value)} placeholder="Motivo..."
+                        rows={3} style={{ width: '100%', marginTop: '8px', resize: 'vertical' }} />
+            </div>
+            <div className="modal-actions confirm-actions">
+              <button className="btn-secondary" onClick={() => setStatusChange(null)}>Volver</button>
+              <button className="btn-danger" disabled={statusLoading || !statusReason.trim()}
+                      onClick={() => doStatusChange(statusChange.ticket, statusChange.action, statusReason.trim())}>
+                {statusLoading ? 'Guardando...' : 'Confirmar'}
               </button>
             </div>
           </div>

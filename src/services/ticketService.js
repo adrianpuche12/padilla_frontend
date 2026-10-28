@@ -21,8 +21,8 @@ const ticketService = {
     return response.data;
   },
 
-  async updateStatus(id, status) {
-    const response = await api.patch(`/api/tickets/${id}/status`, { status });
+  async updateStatus(id, status, reason = null) {
+    const response = await api.patch(`/api/tickets/${id}/status`, { status, rejectionReason: reason });
     return response.data;
   },
 
