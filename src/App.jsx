@@ -12,6 +12,7 @@ import Settings from './pages/Settings';
 import Platform from './pages/Platform';
 import Profile from './pages/Profile';
 import MyHome from './pages/MyHome';
+import Notifications from './pages/Notifications';
 import ChangePassword from './pages/ChangePassword';
 import ForgotPassword from './pages/ForgotPassword';
 import PrivateRoute from './components/PrivateRoute';
@@ -128,6 +129,16 @@ function App() {
         element={
           <PrivateRoute roles={[ROLES.OWNER, ROLES.TENANT]}>
             <MyHome />
+          </PrivateRoute>
+        }
+      />
+
+      {/* PRO-104: notificaciones (los 6 roles) */}
+      <Route
+        path="/notifications"
+        element={
+          <PrivateRoute>
+            <Notifications />
           </PrivateRoute>
         }
       />
