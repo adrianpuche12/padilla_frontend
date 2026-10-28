@@ -13,6 +13,7 @@ import ChangePassword from './pages/ChangePassword';
 import ForgotPassword from './pages/ForgotPassword';
 import PrivateRoute from './components/PrivateRoute';
 import PublicRoute from './components/PublicRoute';
+import { ROLES, STAFF } from './auth/roles';
 import './App.css';
 
 function App() {
@@ -42,7 +43,7 @@ function App() {
       <Route
         path="/users"
         element={
-          <PrivateRoute>
+          <PrivateRoute roles={STAFF}>
             <Users />
           </PrivateRoute>
         }
@@ -52,7 +53,7 @@ function App() {
       <Route
         path="/clients"
         element={
-          <PrivateRoute>
+          <PrivateRoute roles={STAFF}>
             <Clients />
           </PrivateRoute>
         }
@@ -62,7 +63,7 @@ function App() {
       <Route
         path="/providers"
         element={
-          <PrivateRoute>
+          <PrivateRoute roles={STAFF}>
             <Providers />
           </PrivateRoute>
         }
@@ -72,7 +73,7 @@ function App() {
       <Route
         path="/properties"
         element={
-          <PrivateRoute>
+          <PrivateRoute roles={[...STAFF, ROLES.OWNER, ROLES.TENANT]}>
             <Properties />
           </PrivateRoute>
         }
@@ -82,7 +83,7 @@ function App() {
       <Route
         path="/contracts"
         element={
-          <PrivateRoute>
+          <PrivateRoute roles={STAFF}>
             <Contracts />
           </PrivateRoute>
         }
@@ -102,7 +103,7 @@ function App() {
       <Route
         path="/reservas"
         element={
-          <PrivateRoute>
+          <PrivateRoute roles={[...STAFF, ROLES.OWNER]}>
             <Reservas />
           </PrivateRoute>
         }
@@ -112,7 +113,7 @@ function App() {
       <Route
         path="/settings"
         element={
-          <PrivateRoute>
+          <PrivateRoute roles={[ROLES.SUPER_ADMIN]}>
             <Settings />
           </PrivateRoute>
         }
