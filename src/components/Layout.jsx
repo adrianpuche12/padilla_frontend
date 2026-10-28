@@ -72,6 +72,12 @@ function Layout({ children, title }) {
               </>
             )}
 
+            {roles.some(r => ['OWNER', 'TENANT'].includes(String(r).toUpperCase())) && (
+              <NavLink to="/my-home" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+                {roles.some(r => String(r).toUpperCase() === 'OWNER') ? 'Mis propiedades' : 'Mi vivienda'}
+              </NavLink>
+            )}
+
             <NavLink to="/tickets" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
               Tickets
             </NavLink>

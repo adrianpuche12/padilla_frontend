@@ -28,6 +28,12 @@ const contractService = {
     await api.delete(`/api/contracts/${id}`);
   },
 
+  /** PRO-102: nuevo periodo de indexacion. */
+  async addPeriod(id, data) {
+    const response = await api.post(`/api/contracts/${id}/periods`, data);
+    return response.data;
+  },
+
   async getContractPeriods(id) {
     const response = await api.get(`/api/contracts/${id}/periods`);
     return response.data;
