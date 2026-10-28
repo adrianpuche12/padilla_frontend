@@ -13,11 +13,13 @@ import Platform from './pages/Platform';
 import Profile from './pages/Profile';
 import MyHome from './pages/MyHome';
 import Notifications from './pages/Notifications';
+import Reports from './pages/Reports';
+import Audit from './pages/Audit';
 import ChangePassword from './pages/ChangePassword';
 import ForgotPassword from './pages/ForgotPassword';
 import PrivateRoute from './components/PrivateRoute';
 import PublicRoute from './components/PublicRoute';
-import { ROLES, STAFF } from './auth/roles';
+import { ROLES, STAFF, SUPERVISION } from './auth/roles';
 import './App.css';
 
 function App() {
@@ -139,6 +141,26 @@ function App() {
         element={
           <PrivateRoute>
             <Notifications />
+          </PrivateRoute>
+        }
+      />
+
+      {/* PRO-106: reportes (personal y propietario) */}
+      <Route
+        path="/reports"
+        element={
+          <PrivateRoute roles={[...STAFF, ROLES.OWNER]}>
+            <Reports />
+          </PrivateRoute>
+        }
+      />
+
+      {/* PRO-106: auditoria (supervision) */}
+      <Route
+        path="/audit"
+        element={
+          <PrivateRoute roles={SUPERVISION}>
+            <Audit />
           </PrivateRoute>
         }
       />

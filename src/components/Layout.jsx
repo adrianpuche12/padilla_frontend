@@ -89,6 +89,18 @@ function Layout({ children, title }) {
               </NavLink>
             )}
 
+            {roles.some(r => ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'OWNER'].includes(String(r).toUpperCase())) && (
+              <NavLink to="/reports" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+                Reportes
+              </NavLink>
+            )}
+
+            {roles.some(r => ['SUPER_ADMIN', 'MANAGER'].includes(String(r).toUpperCase())) && (
+              <NavLink to="/audit" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+                Auditoría
+              </NavLink>
+            )}
+
             {roles.some(r => String(r).toUpperCase() === 'PLATFORM_ADMIN') && (
               <NavLink to="/platform" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
                 Plataforma
