@@ -13,6 +13,12 @@ const userService = {
     return response.data;
   },
 
+  /** PRO-101: los actores que gestionaba un usuario pasan a otro del mismo rol. */
+  async reassign(fromId, toId) {
+    const response = await api.patch(`/api/users/${fromId}/reassign`, null, { params: { to: toId } });
+    return response.data;
+  },
+
   async getUser(id) {
     const response = await api.get(`/api/users/${id}`);
     return response.data;

@@ -22,6 +22,7 @@ function Users() {
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState(null);
   const [confirmDeactivate, setConfirmDeactivate] = useState(null);
+  const [reassignTo, setReassignTo] = useState('');
   const [confirmReactivate, setConfirmReactivate] = useState(null);
   const [confirmResetPassword, setConfirmResetPassword] = useState(null);
   const [confirmResendAccess, setConfirmResendAccess] = useState(null);
@@ -272,11 +273,28 @@ function Users() {
             </div>
             <div className="confirm-body">
               <p>¿Estás seguro que querés desactivar a <strong>{confirmDeactivate.name}</strong>?</p>
-              <p className="confirm-note">El usuario perderá acceso al sistema.</p>
+              <p className="confirm-note">El usuario perderá acceso al sistema. No se borra ningún dato.</p>
+              {/* PRO-101: los clientes que gestionaba pasan a otro usuario del mismo rol */}
+              {users.some(u => u.role === confirmDeactivate.role && u.active && u.id !== confirmDeactivate.id) && (
+                <label style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 12 }}>
+                  Reasignar sus clientes a
+                  <select value={reassignTo} onChange={e => setReassignTo(e.target.value)}>
+                    <option value="">Automático (otro {roleLabel(confirmDeactivate.role)} activo)</option>
+                    {users.filter(u => u.role === confirmDeactivate.role && u.active && u.id !== confirmDeactivate.id)
+                      .map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+                  </select>
+                </label>
+              )}
             </div>
             <div className="modal-actions confirm-actions">
               <button className="btn-secondary" onClick={() => setConfirmDeactivate(null)}>Cancelar</button>
-              <button className="btn-danger" onClick={() => handleDeactivate(confirmDeactivate)}>Desactivar</button>
+              <button className="btn-danger" onClick={async () => {
+                try {
+                  if (reassignTo) await userService.reassign(confirmDeactivate.id, reassignTo);
+                  setReassignTo('');
+                  handleDeactivate(confirmDeactivate);
+                } catch (err) { setError(errorMessage(err, 'No se pudo reasignar')); setConfirmDeactivate(null); }
+              }}>Desactivar</button>
             </div>
           </div>
         </div>
