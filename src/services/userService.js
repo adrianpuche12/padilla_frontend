@@ -7,6 +7,12 @@ const userService = {
     return response.data;
   },
 
+  /** PRO-093: usuarios de sistema con canManage por fila. */
+  async getSystemUsers() {
+    const response = await api.get('/api/users', { params: { scope: 'system' } });
+    return response.data;
+  },
+
   async getUser(id) {
     const response = await api.get(`/api/users/${id}`);
     return response.data;

@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout';
 import UserForm from '../components/UserForm';
 import userService from '../services/userService';
+import { errorMessage } from '../services/api';
 import './Users.css';
 
 
@@ -45,11 +46,13 @@ function Users() {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await userService.getUsers(filteredRole || null);
-      // Solo mostrar usuarios del sistema (empleados), no clientes
-      setUsers(data.filter(u => SYSTEM_ROLES.includes(u.role)));
+      // PRO-093: el backend devuelve todos los usuarios de sistema de la inmobiliaria (pares y superiores
+      // en solo lectura) con canManage por fila. Antes pedia solo roles inferiores y despues se quedaba
+      // con los de sistema: un ADMIN veia siempre la lista vacia.
+      const data = await userService.getSystemUsers();
+      setUsers(filteredRole ? data.filter(u => u.role === filteredRole) : data);
     } catch (err) {
-      setError('Error al cargar los usuarios');
+      setError(errorMessage(err, 'Error al cargar los usuarios'));
     } finally {
       setIsLoading(false);
     }
@@ -176,7 +179,7 @@ function Users() {
         <td data-label="Alta">{user.createdAt ? new Date(user.createdAt).toLocaleDateString('es-AR') : '-'}</td>
         <td data-label="Acciones">
           <div className="row-actions">
-            {canManage(user.role) && (
+            {(user.canManage ?? canManage(user.role)) && (
               <>
                 <button className="action-btn edit" onClick={() => setEditingUser(user)} title="Editar">✏️</button>
                 {user.active ? (
@@ -227,7 +230,7 @@ function Users() {
         <div className="users-toolbar">
           <select className="role-filter" value={filteredRole} onChange={e => setFilteredRole(e.target.value)}>
             <option value="">Todos los roles</option>
-            {SYSTEM_ROLES.filter(r => ROLE_LEVEL[r] > callerLevel).map(r => <option key={r} value={r}>{roleLabel(r)}</option>)}
+            {SYSTEM_ROLES.map(r => <option key={r} value={r}>{roleLabel(r)}</option>)}
           </select>
           {callerLevel < 3 && (
             <button className="btn-primary" onClick={() => setShowForm(true)}>+ Nuevo usuario</button>
