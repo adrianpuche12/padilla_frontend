@@ -10,6 +10,7 @@ import Tickets from './pages/Tickets';
 import Reservas from './pages/Reservas';
 import Settings from './pages/Settings';
 import Platform from './pages/Platform';
+import Profile from './pages/Profile';
 import ChangePassword from './pages/ChangePassword';
 import ForgotPassword from './pages/ForgotPassword';
 import PrivateRoute from './components/PrivateRoute';
@@ -116,6 +117,16 @@ function App() {
         element={
           <PrivateRoute roles={[ROLES.SUPER_ADMIN]}>
             <Settings />
+          </PrivateRoute>
+        }
+      />
+
+      {/* PRO-101: mi perfil (los 6 roles) */}
+      <Route
+        path="/profile"
+        element={
+          <PrivateRoute>
+            <Profile />
           </PrivateRoute>
         }
       />

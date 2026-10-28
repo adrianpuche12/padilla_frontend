@@ -116,8 +116,10 @@ function Layout({ children, title }) {
           </button>
           <h1 className="app-header-title">{title}</h1>
           <div className="app-header-right">
-            <div className="user-avatar">{getInitials(user?.username)}</div>
-            <span className="header-username">{user?.username}</span>
+            <NavLink to="/profile" className="header-profile-link" title="Mi perfil" style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'inherit', textDecoration: 'none' }}>
+              <div className="user-avatar">{getInitials(user?.username)}</div>
+              <span className="header-username">{user?.username}</span>
+            </NavLink>
             <button
               type="button"
               className="ayuda-boton"

@@ -21,7 +21,7 @@ const PERSONA_LABELS = {
 };
 
 function Providers() {
-  const { roles } = useAuth();
+  const { roles, isSuperAdmin } = useAuth();
   const [providers, setProviders] = useState([]);
   const [filteredSpecialty, setFilteredSpecialty] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -191,13 +191,15 @@ function Providers() {
                     ✅
                   </button>
                 )}
-                <button
-                  className="action-btn delete"
-                  onClick={() => setConfirmDelete(provider)}
-                  title="Eliminar definitivamente"
-                >
-                  🗑️
-                </button>
+                {isSuperAdmin() && (
+                  <button
+                    className="action-btn delete"
+                    onClick={() => setConfirmDelete(provider)}
+                    title="Eliminar definitivamente"
+                  >
+                    🗑️
+                  </button>
+                )}
               </>
             )}
           </div>
@@ -361,7 +363,7 @@ function Providers() {
               </div>
               <div className="modal-body">
                 <p>¿Eliminar a <strong>{confirmDelete.name}</strong> del sistema?</p>
-                <p className="confirm-note">Esta acción es <strong>irreversible</strong>. Se eliminará el usuario de Keycloak y de la base de datos.</p>
+                <p className="confirm-note">Esta acción es <strong>irreversible</strong>. Se eliminará el usuario de Keycloak y de la base de datos. Para conservar el historial usá "Desactivar": sus tickets pendientes vuelven a la cola.</p>
               </div>
               <div className="modal-actions">
                 <button className="btn-secondary" onClick={() => setConfirmDelete(null)}>Cancelar</button>

@@ -30,8 +30,9 @@ const providerService = {
     return response.data;
   },
 
+  /** PRO-101: borrado definitivo (solo SUPER_ADMIN). DELETE /api/clients/{id} ahora es baja logica. */
   async deleteProvider(id) {
-    await api.delete(`/api/clients/${id}`);
+    await api.delete(`/api/clients/${id}/permanent`);
   },
 };
 
