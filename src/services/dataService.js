@@ -1,59 +1,22 @@
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8080';
-
-// Crear instancia de axios con configuracion base
-const apiClient = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-// Interceptor para agregar el token a cada request
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('access_token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Interceptor para manejar errores de autenticacion
-apiClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Token expirado o invalido
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
-);
+// PRO-090: usa el cliente HTTP unico (antes tenia su propia instancia sin refresh)
+import api from './api';
 
 const dataService = {
   // =====================
   // Sellers (Vendedores)
   // =====================
   async getSellers() {
-    const response = await apiClient.get('/api/sellers');
+    const response = await api.get('/api/sellers');
     return response.data;
   },
 
   async getSellerById(id) {
-    const response = await apiClient.get(`/api/sellers/${id}`);
+    const response = await api.get(`/api/sellers/${id}`);
     return response.data;
   },
 
   async getSellerStats(id) {
-    const response = await apiClient.get(`/api/sellers/${id}/stats`);
+    const response = await api.get(`/api/sellers/${id}/stats`);
     return response.data;
   },
 
@@ -61,12 +24,12 @@ const dataService = {
   // Sources (Fuentes)
   // =====================
   async getSources() {
-    const response = await apiClient.get('/api/sources');
+    const response = await api.get('/api/sources');
     return response.data;
   },
 
   async getSourceById(id) {
-    const response = await apiClient.get(`/api/sources/${id}`);
+    const response = await api.get(`/api/sources/${id}`);
     return response.data;
   },
 
@@ -74,22 +37,22 @@ const dataService = {
   // Leads Portal
   // =====================
   async getPortalLeads() {
-    const response = await apiClient.get('/api/leads/portal');
+    const response = await api.get('/api/leads/portal');
     return response.data;
   },
 
   async getPortalLeadsByDate(date) {
-    const response = await apiClient.get(`/api/leads/portal/date/${date}`);
+    const response = await api.get(`/api/leads/portal/date/${date}`);
     return response.data;
   },
 
   async getPortalLeadsBySeller(sellerId) {
-    const response = await apiClient.get(`/api/leads/portal/seller/${sellerId}`);
+    const response = await api.get(`/api/leads/portal/seller/${sellerId}`);
     return response.data;
   },
 
   async getPortalLeadsBySource(sourceId) {
-    const response = await apiClient.get(`/api/leads/portal/source/${sourceId}`);
+    const response = await api.get(`/api/leads/portal/source/${sourceId}`);
     return response.data;
   },
 
@@ -97,12 +60,12 @@ const dataService = {
   // Leads Formulario
   // =====================
   async getFormularioLeads() {
-    const response = await apiClient.get('/api/leads/formulario');
+    const response = await api.get('/api/leads/formulario');
     return response.data;
   },
 
   async getFormularioLeadsByDate(date) {
-    const response = await apiClient.get(`/api/leads/formulario/date/${date}`);
+    const response = await api.get(`/api/leads/formulario/date/${date}`);
     return response.data;
   },
 
@@ -110,12 +73,12 @@ const dataService = {
   // Daily Leads
   // =====================
   async getDailyLeads() {
-    const response = await apiClient.get('/api/leads/daily');
+    const response = await api.get('/api/leads/daily');
     return response.data;
   },
 
   async getDailyLeadsByDate(date) {
-    const response = await apiClient.get(`/api/leads/daily/${date}`);
+    const response = await api.get(`/api/leads/daily/${date}`);
     return response.data;
   },
 
@@ -123,12 +86,12 @@ const dataService = {
   // Statistics
   // =====================
   async getLeadStats() {
-    const response = await apiClient.get('/api/leads/stats');
+    const response = await api.get('/api/leads/stats');
     return response.data;
   },
 
   async getLeadsSummary() {
-    const response = await apiClient.get('/api/leads/stats/summary');
+    const response = await api.get('/api/leads/stats/summary');
     return response.data;
   },
 
@@ -136,7 +99,7 @@ const dataService = {
   // User Dashboard
   // =====================
   async getUserDashboard() {
-    const response = await apiClient.get('/api/user/dashboard');
+    const response = await api.get('/api/user/dashboard');
     return response.data;
   },
 };

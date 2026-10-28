@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import authService from '../services/authService';
+import { isTokenExpiring, refreshTokens } from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -12,50 +13,53 @@ export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Verificar si hay sesion guardada al cargar
+  // Verificar si hay sesion guardada al cargar.
+  // PRO-090: si el token vencio, se espera el refresh ANTES de terminar de cargar (antes isLoading pasaba
+  // a false mientras el refresh seguia en curso y PrivateRoute mandaba a /login).
   useEffect(() => {
-    const initAuth = () => {
+    let cancelado = false;
+    const initAuth = async () => {
       const token = localStorage.getItem(TOKEN_KEY);
       const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
-
-      if (token && !authService.isTokenExpired(token)) {
-        const username = authService.getUsernameFromToken(token);
-        const userRoles = authService.getRolesFromToken(token);
-
-        setUser({ username });
-        setRoles(userRoles);
-        setIsAuthenticated(true);
-      } else if (refreshToken) {
-        // Intentar renovar el token
-        handleRefresh(refreshToken);
+      try {
+        if (token && !isTokenExpiring(token)) {
+          applyToken(token);
+        } else if (refreshToken) {
+          const nuevo = await refreshTokens();
+          if (!cancelado) applyToken(nuevo);
+        }
+      } catch (error) {
+        console.error('Error renovando token:', error);
+        if (!cancelado) handleLogout();
+      } finally {
+        if (!cancelado) setIsLoading(false);
       }
-
-      setIsLoading(false);
     };
-
     initAuth();
+
+    // El cliente HTTP renueva tokens y cierra sesiones: el contexto se mantiene sincronizado
+    const onTokens = (e) => applyToken(e.detail.access_token);
+    const onLogout = () => handleLogout();
+    window.addEventListener('propero:tokens', onTokens);
+    window.addEventListener('propero:logout', onLogout);
+    return () => {
+      cancelado = true;
+      window.removeEventListener('propero:tokens', onTokens);
+      window.removeEventListener('propero:logout', onLogout);
+    };
   }, []);
 
-  const handleRefresh = async (refreshToken) => {
-    try {
-      const data = await authService.refresh(refreshToken);
-      saveTokens(data);
-    } catch (error) {
-      console.error('Error renovando token:', error);
-      handleLogout();
-    }
+  const applyToken = (token) => {
+    setUser({ username: authService.getUsernameFromToken(token) });
+    setRoles(authService.getRolesFromToken(token));
+    setIsAuthenticated(true);
   };
 
   const saveTokens = (data) => {
     localStorage.setItem(TOKEN_KEY, data.access_token);
     localStorage.setItem(REFRESH_TOKEN_KEY, data.refresh_token);
 
-    const username = authService.getUsernameFromToken(data.access_token);
-    const userRoles = authService.getRolesFromToken(data.access_token);
-
-    setUser({ username });
-    setRoles(userRoles);
-    setIsAuthenticated(true);
+    applyToken(data.access_token);
   };
 
   const login = async (username, password) => {
