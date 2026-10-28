@@ -1,11 +1,22 @@
 import { useCallback, useState } from 'react';
 import NotificationBell from './NotificationBell';
+import SidebarIcon from './SidebarIcon';
 import { NavLink, useLocation } from 'react-router-dom';
 import PanelDeAyuda from '../ayuda/PanelDeAyuda';
 import { useAuth } from '../context/AuthContext';
 import ProperoLogo from '../brand/ProperoLogo';
 import { BRAND } from '../brand/brand';
 import './Layout.css';
+
+/** PRO-107: link del menú con ícono; con el menú achicado se ve solo el ícono (el nombre queda en el tooltip). */
+function SideLink({ to, icon, label }) {
+  return (
+    <NavLink to={to} title={label} className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+      <SidebarIcon name={icon} />
+      <span className="sidebar-label">{label}</span>
+    </NavLink>
+  );
+}
 
 function Layout({ children, title }) {
   const { user, roles, logout, isSuperAdmin } = useAuth();
@@ -43,77 +54,49 @@ function Layout({ children, title }) {
           {!sidebarCollapsed && <span className="sidebar-brand-text">{BRAND.name}</span>}
         </div>
 
-        {!sidebarCollapsed && (
-          <nav className="sidebar-nav">
-            <NavLink to="/dashboard" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
-              Dashboard
-            </NavLink>
+        <nav className="sidebar-nav">
+            <SideLink to="/dashboard" icon="dashboard" label="Dashboard" />
 
             {canManageUsers() && (
               <>
-                <NavLink to="/users" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
-                  Usuarios
-                </NavLink>
+                <SideLink to="/users" icon="users" label="Usuarios" />
 
-                <NavLink to="/clients" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
-                  Clientes
-                </NavLink>
+                <SideLink to="/clients" icon="clients" label="Clientes" />
 
-                <NavLink to="/providers" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
-                  Proveedores
-                </NavLink>
+                <SideLink to="/providers" icon="providers" label="Proveedores" />
 
-                <NavLink to="/properties" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
-                  Propiedades
-                </NavLink>
+                <SideLink to="/properties" icon="properties" label="Propiedades" />
 
-                <NavLink to="/contracts" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
-                  Contratos
-                </NavLink>
+                <SideLink to="/contracts" icon="contracts" label="Contratos" />
               </>
             )}
 
             {roles.some(r => ['OWNER', 'TENANT'].includes(String(r).toUpperCase())) && (
-              <NavLink to="/my-home" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
-                {roles.some(r => String(r).toUpperCase() === 'OWNER') ? 'Mis propiedades' : 'Mi vivienda'}
-              </NavLink>
+              <SideLink to="/my-home" icon="myHome" label={roles.some(r => String(r).toUpperCase() === 'OWNER') ? 'Mis propiedades' : 'Mi vivienda'} />
             )}
 
-            <NavLink to="/tickets" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
-              Tickets
-            </NavLink>
+            <SideLink to="/tickets" icon="tickets" label="Tickets" />
 
             {canManageUsers() && (
-              <NavLink to="/reservas" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
-                Reservas
-              </NavLink>
+              <SideLink to="/reservas" icon="reservas" label="Reservas" />
             )}
 
             {roles.some(r => ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'OWNER'].includes(String(r).toUpperCase())) && (
-              <NavLink to="/reports" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
-                Reportes
-              </NavLink>
+              <SideLink to="/reports" icon="reports" label="Reportes" />
             )}
 
             {roles.some(r => ['SUPER_ADMIN', 'MANAGER'].includes(String(r).toUpperCase())) && (
-              <NavLink to="/audit" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
-                Auditoría
-              </NavLink>
+              <SideLink to="/audit" icon="audit" label="Auditoría" />
             )}
 
             {roles.some(r => String(r).toUpperCase() === 'PLATFORM_ADMIN') && (
-              <NavLink to="/platform" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
-                Plataforma
-              </NavLink>
+              <SideLink to="/platform" icon="platform" label="Plataforma" />
             )}
 
             {isSuperAdmin() && (
-              <NavLink to="/settings" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
-                Configuración
-              </NavLink>
+              <SideLink to="/settings" icon="settings" label="Configuración" />
             )}
-          </nav>
-        )}
+        </nav>
 
         <button
           className="sidebar-toggle"
