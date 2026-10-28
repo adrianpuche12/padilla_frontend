@@ -1,3 +1,6 @@
+import { useEffect, useState } from 'react';
+import api from '../services/api';
+import Attachments from './Attachments';
 import './PropertyDetailModal.css';
 
 const TYPE_LABEL = {
@@ -48,6 +51,12 @@ function Field({ label, value }) {
 }
 
 function PropertyDetailModal({ property, ownerName, onClose }) {
+  // PRO-102: historial de contratos e incidencias de la propiedad
+  const [history, setHistory] = useState(null);
+  useEffect(() => {
+    api.get(`/api/properties/${property.id}/history`).then(r => setHistory(r.data)).catch(() => setHistory({ contracts: [], tickets: [] }));
+  }, [property.id]);
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal property-detail-modal" onClick={e => e.stopPropagation()}>
@@ -98,6 +107,21 @@ function PropertyDetailModal({ property, ownerName, onClose }) {
             </div>
           </div>
 
+          <div className="detail-section">
+            <h3 className="detail-section-title">Historial</h3>
+            {!history ? <p>Cargando...</p> : (history.contracts.length + history.tickets.length === 0 ? <p>Sin historial.</p> : (
+              <ul className="module-list">
+                {history.contracts.map(c => (
+                  <li key={c.id}>Contrato {c.startDate} a {c.endDate} · {c.tenantName || 'sin inquilino'} · {c.status}</li>
+                ))}
+                {history.tickets.map(t => (
+                  <li key={t.id}>Ticket #{t.ticketNumber} · {t.title} · {t.status}</li>
+                ))}
+              </ul>
+            ))}
+          </div>
+
+          <Attachments entityType="PROPIEDAD" entityId={property.id} title="Documentos de la propiedad" />
         </div>
 
         <div className="modal-actions">

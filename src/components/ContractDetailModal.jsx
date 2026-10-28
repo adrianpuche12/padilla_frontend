@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import contractService from '../services/contractService';
+import Attachments from './Attachments';
+import { errorMessage } from '../services/api';
+import '../pages/Modules.css';
 import './ContractDetailModal.css';
 
 const STATUS_LABEL = { ACTIVE: 'Activo', EXPIRED: 'Vencido', TERMINATED: 'Rescindido' };
@@ -33,13 +36,29 @@ function Field({ label, value }) {
 function ContractDetailModal({ contract, propertyAddress, ownerName, tenantName, onClose }) {
   const [periods, setPeriods] = useState([]);
   const [loadingPeriods, setLoadingPeriods] = useState(true);
+  // PRO-102: alta de periodos de indexacion (por monto o coeficiente)
+  const [nuevo, setNuevo] = useState({ periodFrom: '', rentAmount: '', adjustmentIndex: '' });
+  const [periodError, setPeriodError] = useState(null);
 
-  useEffect(() => {
-    contractService.getContractPeriods(contract.id)
-      .then(setPeriods)
-      .catch(() => setPeriods([]))
-      .finally(() => setLoadingPeriods(false));
-  }, [contract.id]);
+  const cargarPeriodos = () => contractService.getContractPeriods(contract.id)
+    .then(setPeriods)
+    .catch(() => setPeriods([]))
+    .finally(() => setLoadingPeriods(false));
+
+  useEffect(() => { cargarPeriodos(); }, [contract.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const agregarPeriodo = async () => {
+    setPeriodError(null);
+    try {
+      await contractService.addPeriod(contract.id, {
+        periodFrom: nuevo.periodFrom,
+        rentAmount: nuevo.rentAmount ? Number(nuevo.rentAmount) : null,
+        adjustmentIndex: nuevo.adjustmentIndex ? Number(nuevo.adjustmentIndex) : null,
+      });
+      setNuevo({ periodFrom: '', rentAmount: '', adjustmentIndex: '' });
+      cargarPeriodos();
+    } catch (err) { setPeriodError(errorMessage(err, 'No se pudo agregar el período')); }
+  };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -122,6 +141,20 @@ function ContractDetailModal({ contract, propertyAddress, ownerName, tenantName,
             )}
           </div>
 
+          {contract.status === 'ACTIVE' && (
+            <div className="detail-section">
+              <h3 className="detail-section-title">Nuevo período (ajuste)</h3>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+                <label className="module-field">Desde<input type="date" value={nuevo.periodFrom} onChange={e => setNuevo(n => ({ ...n, periodFrom: e.target.value }))} /></label>
+                <label className="module-field">Monto nuevo<input type="number" min="0" value={nuevo.rentAmount} onChange={e => setNuevo(n => ({ ...n, rentAmount: e.target.value }))} placeholder="o coeficiente →" /></label>
+                <label className="module-field">Coeficiente (ICL)<input type="number" step="0.0001" min="0" value={nuevo.adjustmentIndex} onChange={e => setNuevo(n => ({ ...n, adjustmentIndex: e.target.value }))} placeholder="ej. 1.1523" /></label>
+                <button className="btn-primary" onClick={agregarPeriodo} disabled={!nuevo.periodFrom || (!nuevo.rentAmount && !nuevo.adjustmentIndex)}>Agregar</button>
+              </div>
+              {periodError && <div className="error-banner"><span>{periodError}</span></div>}
+            </div>
+          )}
+
+          <Attachments entityType="CONTRATO" entityId={contract.id} title="Documentos del contrato" />
         </div>
 
         <div className="modal-actions">

@@ -11,6 +11,7 @@ import Reservas from './pages/Reservas';
 import Settings from './pages/Settings';
 import Platform from './pages/Platform';
 import Profile from './pages/Profile';
+import MyHome from './pages/MyHome';
 import ChangePassword from './pages/ChangePassword';
 import ForgotPassword from './pages/ForgotPassword';
 import PrivateRoute from './components/PrivateRoute';
@@ -117,6 +118,16 @@ function App() {
         element={
           <PrivateRoute roles={[ROLES.SUPER_ADMIN]}>
             <Settings />
+          </PrivateRoute>
+        }
+      />
+
+      {/* PRO-102: mis propiedades (OWNER) / mi vivienda (TENANT) */}
+      <Route
+        path="/my-home"
+        element={
+          <PrivateRoute roles={[ROLES.OWNER, ROLES.TENANT]}>
+            <MyHome />
           </PrivateRoute>
         }
       />
