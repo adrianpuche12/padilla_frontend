@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import Layout from '../components/Layout';
 import reservaService from '../services/reservaService';
+import api, { errorMessage } from '../services/api';
+import { AGENCIA_VACIA, agenciaParaDocumentos } from './agenciaDocumentos';
 import './Reservas.css';
 
 // ── Número a letras ──────────────────────────────────────────────────────────
@@ -82,7 +84,7 @@ function Vacio({ children }) {
 // ────────────────────────────────────────────────────────────────────────────
 // FC1 — Recibo de Reserva (texto legal completo)
 // ────────────────────────────────────────────────────────────────────────────
-function ReciboPreview({ r }) {
+function ReciboPreview({ r, a = AGENCIA_VACIA }) {
   const nombre = nombreCompleto(r);
   const fecha  = partsFecha(r.fechaRecibo || r.createdAt);
 
@@ -90,7 +92,7 @@ function ReciboPreview({ r }) {
     <div className="recibo-doc">
       <div className="recibo-header">
         <div className="recibo-logo-area">
-          <div className="recibo-logo-placeholder">S. RAMASCO PADILLA<br/>Negocios Inmobiliarios</div>
+          <div className="recibo-logo-placeholder">{a.nombreComercial}</div>
         </div>
         <div className="recibo-title-area">
           <h2 className="recibo-title">Recibo de Reserva de Alquiler</h2>
@@ -106,22 +108,22 @@ function ReciboPreview({ r }) {
           CUIT – CUIL Nº <strong>{r.cuil || '_______________'}</strong>,
           de apellido materno <strong>{r.apellidoMaterno || '_______________'}</strong>,
           nacido/a el día <strong>{formatNacimiento(r.fechaNacimiento) || '_______________'}</strong>,
-          con domicilio en calle <strong>{r.domicilioActual || '_______________'}</strong>, de la ciudad de Rosario, provincia de Santa Fe,
+          con domicilio en calle <strong>{r.domicilioActual || '_______________'}</strong>, de la ciudad de {a.ciudad}, provincia de {a.provincia},
           de profesión: <strong>{r.profesion || '_______________'}</strong>,
           teléfono celular: <strong>{r.telefono || '_______________'}</strong>,
           correo electrónico: <strong>{r.email || '_______________'}</strong>,
           condición fiscal: <strong>{r.condicionFiscal || '_______________'}</strong>,
           la cantidad de <strong>{numeroALetras(r.monto)}</strong> (<strong>{formatPesos(r.monto)}</strong>)
           por <strong>{r.medioPago || 'transferencia bancaria'}</strong>, en concepto de reserva de la propiedad sita en calle{' '}
-          <strong>{r.propiedad || '_______________'}</strong>, de la ciudad de Rosario, provincia de Santa Fe,
-          que administra la inmobiliaria SEBASTIAN RAMASCO PADILLA, NEGOCIOS INMOBILIARIOS.
+          <strong>{r.propiedad || '_______________'}</strong>, de la ciudad de {a.ciudad}, provincia de {a.provincia},
+          que administra la inmobiliaria {a.razonSocial}.
           Se deja constancia que la precitada suma es de carácter provisorio y en caso de sufrir un incremento en sus costos, será informado al/la RESERVANTE.
           La suma recibida tendrá distinta aplicación conforme las circunstancias que se detallan a continuación:
         </p>
 
         <ol className="lista-letras">
           <li>
-            Si efectivamente se celebrase el contrato de locación la suma será imputada a cuenta de comisión inmobiliaria que se compone del cinco por ciento más IVA (5% + IVA) del monto total del contrato suscripto, manifestando el/la RESERVANTE que acepta el pago de la misma y que renuncia a las facultades de protesto previstas por el art. 1346 CCCN.&nbsp;-
+            Si efectivamente se celebrase el contrato de locación la suma será imputada a cuenta de comisión inmobiliaria que se compone del {a.comisionTexto} del monto total del contrato suscripto, manifestando el/la RESERVANTE que acepta el pago de la misma y que renuncia a las facultades de protesto previstas por el art. 1346 CCCN.&nbsp;-
           </li>
           <li>
             Si las garantías propietarias no fuesen aceptadas por EL LOCADOR, la suma en concepto de reserva será devuelta en su totalidad.&nbsp;-
@@ -130,12 +132,12 @@ function ReciboPreview({ r }) {
             Si las garantías se encontraran observadas a nivel comercial en el BANCO CENTRAL DE LA REPUBLICA ARGENTINA se devolverá el cincuenta por ciento (50&nbsp;%) de la suma recibida en concepto de reserva.&nbsp;-
           </li>
           <li>
-            Si el contrato de locación no se celebrase, por exclusiva voluntad del/la Sr./Sra. <strong>{nombre || '_______________'}</strong> sin acreditar ninguna causa que justifique su conducta, la suma no será devuelta y se imputará al pago de confección del contrato y a falsa comisión de la inmobiliaria SEBASTIAN RAMASCO PADILLA, NEGOCIOS INMOBILIARIOS.
+            Si el contrato de locación no se celebrase, por exclusiva voluntad del/la Sr./Sra. <strong>{nombre || '_______________'}</strong> sin acreditar ninguna causa que justifique su conducta, la suma no será devuelta y se imputará al pago de confección del contrato y a falsa comisión de la inmobiliaria {a.razonSocial}.
           </li>
         </ol>
 
         <p className="recibo-body">
-          La documentación requerida deberá ser enviada al correo electrónico: <strong>contratos@sramascopadilla.com.ar</strong>. La misma incluye: datos personales del/los locatario/s y fiadores, y toda la documentación indicada de las garantías. El incumplimiento de la referida obligación de hacer en el plazo de tres (3) días corridos, dará por caída la presente reserva sin necesidad de notificación alguna, quedando las sumas entregadas a favor de la inmobiliaria SEBASTIAN RAMASCO PADILLA NEGOCIOS INMOBILIARIOS y serán imputadas al pago de confección del contrato y a falsa comisión de la inmobiliaria SEBASTIAN RAMASCO PADILLA, NEGOCIOS INMOBILIARIOS. Se deja constancia que el/la RESERVANTE acepta de plena conformidad la penalidad dispuesta y en caso de no cumplir con su obligación, nada más tendrá que reclamar al corredor inmobiliario.-
+          La documentación requerida deberá ser enviada al correo electrónico: <strong>{a.emailContratos}</strong>. La misma incluye: datos personales del/los locatario/s y fiadores, y toda la documentación indicada de las garantías. El incumplimiento de la referida obligación de hacer en el plazo de tres (3) días corridos, dará por caída la presente reserva sin necesidad de notificación alguna, quedando las sumas entregadas a favor de la inmobiliaria {a.razonSocial} y serán imputadas al pago de confección del contrato y a falsa comisión de la inmobiliaria {a.razonSocial}. Se deja constancia que el/la RESERVANTE acepta de plena conformidad la penalidad dispuesta y en caso de no cumplir con su obligación, nada más tendrá que reclamar al corredor inmobiliario.-
         </p>
 
         <p className="recibo-body">
@@ -143,7 +145,7 @@ function ReciboPreview({ r }) {
         </p>
 
         <p className="recibo-body">
-          No habiendo sido observada la reserva, se enviará el llamado a la firma del contrato de locación al correo electrónico denunciado en la presente y en forma automática correrá un plazo perentorio e improrrogable de cuarenta y ocho (48) horas hábiles para la rúbrica del contrato. El/la RESERVANTE, acepta que los rubros emergentes del contrato comiencen a cobrarse a partir de las cuarenta y ocho (48) horas como máximo de recibido el e-mail en la casilla denunciada. En el supuesto de que EL LOCATARIO ofreciese garantías cuyos domicilios sean fuera de la ciudad de Rosario y pretenda rubricar los contratos ante autoridad y/o escribano en la localidad que estos residan, deberá presentar el contrato en el plazo de cinco (05) días corridos a la inmobiliaria debidamente rubricado. Bajo apercibimiento de que deba abonar la multa que el API aplique sobre el sellado fuera de término.
+          No habiendo sido observada la reserva, se enviará el llamado a la firma del contrato de locación al correo electrónico denunciado en la presente y en forma automática correrá un plazo perentorio e improrrogable de cuarenta y ocho (48) horas hábiles para la rúbrica del contrato. El/la RESERVANTE, acepta que los rubros emergentes del contrato comiencen a cobrarse a partir de las cuarenta y ocho (48) horas como máximo de recibido el e-mail en la casilla denunciada. En el supuesto de que EL LOCATARIO ofreciese garantías cuyos domicilios sean fuera de la ciudad de {a.ciudad} y pretenda rubricar los contratos ante autoridad y/o escribano en la localidad que estos residan, deberá presentar el contrato en el plazo de cinco (05) días corridos a la inmobiliaria debidamente rubricado. Bajo apercibimiento de que deba abonar la multa que el API aplique sobre el sellado fuera de término.
         </p>
 
         <p className="recibo-body">
@@ -152,7 +154,7 @@ function ReciboPreview({ r }) {
 
         <ol className="lista-sanciones">
           <li>
-            Quedando las sumas entregadas a favor de la inmobiliaria SEBASTIAN RAMASCO PADILLA, NEGOCIOS INMOBILIARIOS y serán imputadas al pago de confección del contrato y a falsa comisión de la inmobiliaria SEBASTIAN RAMASCO PADILLA, NEGOCIOS INMOBILIARIOS.
+            Quedando las sumas entregadas a favor de la inmobiliaria {a.razonSocial} y serán imputadas al pago de confección del contrato y a falsa comisión de la inmobiliaria {a.razonSocial}.
           </li>
           <li>
             Que el/la RESERVANTE abone el proporcional del canon locativo, impuestos, tasas y expensas por el total de tiempo de la demora en la firma del contrato de locación.
@@ -160,7 +162,7 @@ function ReciboPreview({ r }) {
         </ol>
 
         <p className="recibo-body">
-          El/la RESERVANTE, se obliga a abonar a SEBASTIAN RAMASCO PADILLA, NEGOCIOS INMOBILIARIOS, la comisión inmobiliaria del cinco por ciento más IVA (5&nbsp;% + IVA) del total de la operación que se concrete. Asimismo, en caso de contrato de locación de vivienda, se obliga a abonar mensualmente, durante la vigencia del contrato de locación a SEBASTIAN RAMASCO PADILLA, NEGOCIOS INMOBILIARIOS, la cuota del seguro de incendio y responsabilidad civil del inmueble objeto de la presente reserva. La póliza del seguro será contratada, sin excepción, por la inmobiliaria SEBASTIAN RAMASCO PADILLA, NEGOCIOS INMOBILIARIOS, prestando el/la RESERVANTE plena conformidad al monto de la póliza y a la empresa que le será informado una vez celebrado el contrato. En caso que se tratase de un contrato comercial, la contratación de la mencionada póliza quedará a exclusivo cargo de la parte LOCATARIA, debiendo endosarse a favor del LOCADOR.
+          El/la RESERVANTE, se obliga a abonar a {a.razonSocial}, la comisión inmobiliaria del {a.comisionTexto} del total de la operación que se concrete. Asimismo, en caso de contrato de locación de vivienda, se obliga a abonar mensualmente, durante la vigencia del contrato de locación a {a.razonSocial}, la cuota del seguro de incendio y responsabilidad civil del inmueble objeto de la presente reserva. La póliza del seguro será contratada, sin excepción, por la inmobiliaria {a.razonSocial}, prestando el/la RESERVANTE plena conformidad al monto de la póliza y a la empresa que le será informado una vez celebrado el contrato. En caso que se tratase de un contrato comercial, la contratación de la mencionada póliza quedará a exclusivo cargo de la parte LOCATARIA, debiendo endosarse a favor del LOCADOR.
         </p>
 
         <p className="recibo-body">
@@ -180,11 +182,11 @@ function ReciboPreview({ r }) {
         </ol>
 
         <p className="recibo-body">
-          En este acto, el/la reservante, rubrica una planilla de anexo en la cual se le informa la totalidad de los gastos y montos que erogarán del contrato de locación a firmarse por las partes, prestando absoluta conformidad a los montos que se le informan en la referida planilla. El/la RESERVANTE toma conocimiento en este acto, que <strong>EL LOCATARIO deberá abonar el monto del alquiler por mes adelantado entre el día 1° al día 5° inclusive de cada mes</strong>, por los siguientes canales de pago: mediante código electrónico de pago por plataforma HOME BANKING o en forma presencial descargando el cupón de pago de la plataforma GEXION y dirigiéndose a las entidades informadas en el referido cupón de pago, o adonde EL LOCADOR y/o Administrador lo indique en el futuro. El reservante manifiesta en este acto que es debidamente informado de la fecha de pago mensual del canon locativo y que lo acepta no teniendo nada que reclamar durante la vigencia del contrato de locación ni al LOCADOR ni al Administrador SEBASTIAN RAMASCO PADILLA, NEGOCIOS INMOBILIARIOS.
+          En este acto, el/la reservante, rubrica una planilla de anexo en la cual se le informa la totalidad de los gastos y montos que erogarán del contrato de locación a firmarse por las partes, prestando absoluta conformidad a los montos que se le informan en la referida planilla. El/la RESERVANTE toma conocimiento en este acto, que <strong>EL LOCATARIO deberá abonar el monto del alquiler por mes adelantado entre el día 1° al día 5° inclusive de cada mes</strong>, por los siguientes canales de pago: mediante código electrónico de pago por plataforma HOME BANKING o en forma presencial descargando el cupón de pago de la plataforma {a.plataformaPago} y dirigiéndose a las entidades informadas en el referido cupón de pago, o adonde EL LOCADOR y/o Administrador lo indique en el futuro. El reservante manifiesta en este acto que es debidamente informado de la fecha de pago mensual del canon locativo y que lo acepta no teniendo nada que reclamar durante la vigencia del contrato de locación ni al LOCADOR ni al Administrador {a.razonSocial}.
         </p>
 
         <p className="recibo-body">
-          La presente reserva queda sujeta a la acreditación, en el plazo de veinticuatro (24) horas a contar desde la fecha de la presente reserva, del monto establecido en la misma. Caso contrario, quedará sin efecto en forma automática, sin necesidad de notificación alguna, sin tener el/la reservante, nada que reclamar al titular del inmueble ni a SEBASTIAN RAMASCO PADILLA, NEGOCIOS INMOBILIARIOS.
+          La presente reserva queda sujeta a la acreditación, en el plazo de veinticuatro (24) horas a contar desde la fecha de la presente reserva, del monto establecido en la misma. Caso contrario, quedará sin efecto en forma automática, sin necesidad de notificación alguna, sin tener el/la reservante, nada que reclamar al titular del inmueble ni a {a.razonSocial}.
         </p>
 
         <p className="recibo-body">
@@ -192,7 +194,7 @@ function ReciboPreview({ r }) {
         </p>
 
         <p className="recibo-body">
-          En consecuencia, el/la reservante, acepta de plena conformidad lo dispuesto sobre la reserva abonada y manifiesta que en caso de no concretarse el contrato objeto de la presente reserva, nada más tendrá que reclamar a SEBASTIAN RAMASCO PADILLA, NEGOCIOS INMOBILIARIOS por ningún concepto.&nbsp;-
+          En consecuencia, el/la reservante, acepta de plena conformidad lo dispuesto sobre la reserva abonada y manifiesta que en caso de no concretarse el contrato objeto de la presente reserva, nada más tendrá que reclamar a {a.razonSocial} por ningún concepto.&nbsp;-
         </p>
 
         <p className="recibo-body">
@@ -200,16 +202,16 @@ function ReciboPreview({ r }) {
         </p>
 
         <p className="recibo-body">
-          Se suscriben dos (2) ejemplares de igual tenor y a un solo efecto en la ciudad de Rosario, a los{' '}
+          Se suscriben dos (2) ejemplares de igual tenor y a un solo efecto en la ciudad de {a.ciudad}, a los{' '}
           <strong>{fecha.dia}</strong> días del mes de <strong>{fecha.mes}</strong> de <strong>{fecha.anio}</strong>.&nbsp;-
         </p>
 
         <div className="recibo-firma">
           <div className="recibo-firma-bloque">
             <div className="recibo-firma-linea" />
-            <p className="recibo-firma-nombre">Sebastián Ramasco Padilla</p>
+            <p className="recibo-firma-nombre">{a.corredorNombre}</p>
             <p className="recibo-firma-cargo">Negocios Inmobiliarios</p>
-            <p className="recibo-firma-mat">Mat. C.I.C.I.C.P.S.F. N° 829</p>
+            <p className="recibo-firma-mat">{a.corredorMatricula}</p>
           </div>
           <div className="recibo-firma-bloque">
             <div className="recibo-firma-linea" />
@@ -225,7 +227,7 @@ function ReciboPreview({ r }) {
 // ────────────────────────────────────────────────────────────────────────────
 // FC10 — Entrega de Copia
 // ────────────────────────────────────────────────────────────────────────────
-function EntregaCopiaPreview({ r }) {
+function EntregaCopiaPreview({ r, a = AGENCIA_VACIA }) {
   const nombre = nombreCompleto(r);
   const fecha  = partsFecha(r.fechaRecibo || r.createdAt);
 
@@ -233,7 +235,7 @@ function EntregaCopiaPreview({ r }) {
     <div className="recibo-doc">
       <div className="recibo-header">
         <div className="recibo-logo-area">
-          <div className="recibo-logo-placeholder">S. RAMASCO PADILLA<br/>Negocios Inmobiliarios</div>
+          <div className="recibo-logo-placeholder">{a.nombreComercial}</div>
         </div>
         <div className="recibo-title-area">
           <h2 className="recibo-title">Recibo de Entrega de Copia</h2>
@@ -243,13 +245,13 @@ function EntregaCopiaPreview({ r }) {
 
       <div className="recibo-body-wrap">
         <p className="recibo-body">
-          Por la presente, SEBASTIÁN RAMASCO PADILLA, Negocios Inmobiliarios, en su carácter de corredor público inmobiliario, hace entrega al/la Sr./Sra.{' '}
+          Por la presente, {a.razonSocial}, en su carácter de corredor público inmobiliario, hace entrega al/la Sr./Sra.{' '}
           <strong>{nombre || '_______________'}</strong>,
           DNI Nº <strong>{r.dni || '_______________'}</strong>,
           CUIT – CUIL Nº <strong>{r.cuil || '_______________'}</strong>,
-          con domicilio en calle <strong>{r.domicilioActual || '_______________'}</strong>, de la ciudad de Rosario, provincia de Santa Fe,
+          con domicilio en calle <strong>{r.domicilioActual || '_______________'}</strong>, de la ciudad de {a.ciudad}, provincia de {a.provincia},
           de una (1) copia del Recibo de Reserva de Locación (FC1) correspondiente a la propiedad ubicada en calle{' '}
-          <strong>{r.propiedad || '_______________'}</strong>, de la ciudad de Rosario, provincia de Santa Fe.
+          <strong>{r.propiedad || '_______________'}</strong>, de la ciudad de {a.ciudad}, provincia de {a.provincia}.
         </p>
 
         <p className="recibo-body">
@@ -257,7 +259,7 @@ function EntregaCopiaPreview({ r }) {
         </p>
 
         <p className="recibo-body">
-          Asimismo, el/la firmante declara conocer y aceptar las condiciones de la reserva, los plazos y las obligaciones emergentes del instrumento referenciado, no teniendo nada más que reclamar a SEBASTIÁN RAMASCO PADILLA, NEGOCIOS INMOBILIARIOS por ningún concepto.&nbsp;-
+          Asimismo, el/la firmante declara conocer y aceptar las condiciones de la reserva, los plazos y las obligaciones emergentes del instrumento referenciado, no teniendo nada más que reclamar a {a.razonSocial} por ningún concepto.&nbsp;-
         </p>
 
         <p className="recibo-body">
@@ -265,7 +267,7 @@ function EntregaCopiaPreview({ r }) {
         </p>
 
         <p className="recibo-body">
-          Se suscriben dos (2) ejemplares de igual tenor y a un solo efecto en la ciudad de Rosario, a los{' '}
+          Se suscriben dos (2) ejemplares de igual tenor y a un solo efecto en la ciudad de {a.ciudad}, a los{' '}
           <strong>{fecha.dia}</strong> días del mes de <strong>{fecha.mes}</strong> de <strong>{fecha.anio}</strong>.&nbsp;-
         </p>
 
@@ -278,9 +280,9 @@ function EntregaCopiaPreview({ r }) {
           </div>
           <div className="recibo-firma-bloque">
             <div className="recibo-firma-linea" />
-            <p className="recibo-firma-nombre">Sebastián Ramasco Padilla</p>
+            <p className="recibo-firma-nombre">{a.corredorNombre}</p>
             <p className="recibo-firma-cargo">Corredor Público Inmobiliario</p>
-            <p className="recibo-firma-mat">Mat. C.I.C.I.C.P.S.F. N° 829</p>
+            <p className="recibo-firma-mat">{a.corredorMatricula}</p>
           </div>
         </div>
       </div>
@@ -291,7 +293,7 @@ function EntregaCopiaPreview({ r }) {
 // ────────────────────────────────────────────────────────────────────────────
 // CTR — Contrato de Locación
 // ────────────────────────────────────────────────────────────────────────────
-function ContratoPreview({ r }) {
+function ContratoPreview({ r, a = AGENCIA_VACIA }) {
   const nombre   = nombreCompleto(r);
   const fecha    = partsFecha(r.fechaRecibo || r.createdAt);
   const garantia = garantiaStr(r);
@@ -301,7 +303,7 @@ function ContratoPreview({ r }) {
     <div className="recibo-doc">
       <div className="recibo-header">
         <div className="recibo-logo-area">
-          <div className="recibo-logo-placeholder">S. RAMASCO PADILLA<br/>Negocios Inmobiliarios</div>
+          <div className="recibo-logo-placeholder">{a.nombreComercial}</div>
         </div>
         <div className="recibo-title-area">
           <h2 className="recibo-title">Contrato de Locación</h2>
@@ -313,7 +315,7 @@ function ContratoPreview({ r }) {
 
         <p className="clausula-titulo">Primero — Partes</p>
         <p className="recibo-body">
-          En la ciudad de Rosario, provincia de Santa Fe, a los <strong>{fecha.dia}</strong> días del mes de <strong>{fecha.mes}</strong> de <strong>{fecha.anio}</strong>, entre:
+          En la ciudad de {a.ciudad}, provincia de {a.provincia}, a los <strong>{fecha.dia}</strong> días del mes de <strong>{fecha.mes}</strong> de <strong>{fecha.anio}</strong>, entre:
         </p>
         <p className="recibo-body">
           <strong>EL LOCADOR:</strong> Sr./Sra. {(r.locadorNombre || r.locadorApellido) ? <strong>{[r.locadorNombre, r.locadorApellido].filter(Boolean).join(' ')}</strong> : <Vacio>NOMBRE PROPIETARIO</Vacio>}, DNI Nº {r.locadorDni ? <strong>{r.locadorDni}</strong> : <Vacio>DNI PROPIETARIO</Vacio>}, con domicilio en {r.locadorDomicilio ? <strong>{r.locadorDomicilio}</strong> : <Vacio>DOMICILIO PROPIETARIO</Vacio>}, en adelante denominado/a "EL LOCADOR"; y
@@ -333,7 +335,7 @@ function ContratoPreview({ r }) {
 
         <p className="clausula-titulo">Segunda — Objeto</p>
         <p className="recibo-body">
-          EL LOCADOR da en locación al LOCATARIO, el inmueble de su propiedad ubicado en calle <strong>{r.propiedad || '_______________'}</strong>, ciudad de Rosario, provincia de Santa Fe (en adelante "el inmueble"). El inmueble se destina exclusivamente a vivienda del LOCATARIO y su grupo familiar conviviente, quedando expresamente prohibido todo destino diferente al pactado sin autorización escrita del LOCADOR.
+          EL LOCADOR da en locación al LOCATARIO, el inmueble de su propiedad ubicado en calle <strong>{r.propiedad || '_______________'}</strong>, ciudad de {a.ciudad}, provincia de {a.provincia} (en adelante "el inmueble"). El inmueble se destina exclusivamente a vivienda del LOCATARIO y su grupo familiar conviviente, quedando expresamente prohibido todo destino diferente al pactado sin autorización escrita del LOCADOR.
         </p>
 
         <p className="clausula-titulo">Tercera — Plazo</p>
@@ -343,7 +345,7 @@ function ContratoPreview({ r }) {
 
         <p className="clausula-titulo">Cuarta — Canon locativo</p>
         <p className="recibo-body">
-          El canon locativo mensual se establece en la suma de <Vacio>MONTO EN LETRAS</Vacio> (<Vacio>$ MONTO</Vacio>), el cual será abonado por mes adelantado entre el día 1° y el día 5° inclusive de cada mes, mediante código electrónico de pago por plataforma HOME BANKING o en forma presencial descargando el cupón de pago de la plataforma GEXION, o adonde EL LOCADOR y/o su administrador lo indique en el futuro. El canon podrá ajustarse conforme al Índice para Contratos de Locación (ICL) elaborado por el Banco Central de la República Argentina.
+          El canon locativo mensual se establece en la suma de <Vacio>MONTO EN LETRAS</Vacio> (<Vacio>$ MONTO</Vacio>), el cual será abonado por mes adelantado entre el día 1° y el día 5° inclusive de cada mes, mediante código electrónico de pago por plataforma HOME BANKING o en forma presencial descargando el cupón de pago de la plataforma {a.plataformaPago}, o adonde EL LOCADOR y/o su administrador lo indique en el futuro. El canon podrá ajustarse conforme al Índice para Contratos de Locación (ICL) elaborado por el Banco Central de la República Argentina.
         </p>
 
         <p className="clausula-titulo">Quinta — Depósito en garantía</p>
@@ -360,7 +362,7 @@ function ContratoPreview({ r }) {
           <div key={i} className="ctr-garante-seccion">
             <p className="ctr-garante-titulo">Garante {i + 1}</p>
             <p className="recibo-body">
-              Sr./Sra. <strong>{g.nombre}</strong>{g.dni ? `, DNI Nº ${g.dni}` : ''}{g.cuil ? `, CUIL Nº ${g.cuil}` : ''}{g.domicilio ? `, con domicilio en ${g.domicilio}, ciudad de Rosario, provincia de Santa Fe` : ''}, quien en su carácter de GARANTE asume solidariamente con EL LOCATARIO el cumplimiento de todas las obligaciones emergentes del presente contrato.{g.descripcionBien ? ` Bien ofrecido como garantía: ${g.descripcionBien}.` : ''}
+              Sr./Sra. <strong>{g.nombre}</strong>{g.dni ? `, DNI Nº ${g.dni}` : ''}{g.cuil ? `, CUIL Nº ${g.cuil}` : ''}{g.domicilio ? `, con domicilio en ${g.domicilio}, ciudad de ${a.ciudad}, provincia de ${a.provincia}` : ''}, quien en su carácter de GARANTE asume solidariamente con EL LOCATARIO el cumplimiento de todas las obligaciones emergentes del presente contrato.{g.descripcionBien ? ` Bien ofrecido como garantía: ${g.descripcionBien}.` : ''}
             </p>
           </div>
         ))}
@@ -372,7 +374,7 @@ function ContratoPreview({ r }) {
 
         <p className="clausula-titulo">Octava — Expensas, impuestos y servicios</p>
         <p className="recibo-body">
-          Las expensas comunes ordinarias, los servicios de luz, gas, agua, teléfono, internet y cable correrán por cuenta exclusiva del LOCATARIO a partir de la fecha de entrega del inmueble. Las expensas comunes extraordinarias y los impuestos provinciales y municipales que graven el inmueble estarán a cargo del LOCADOR. EL LOCATARIO se obliga a abonar el proporcional del seguro de incendio y responsabilidad civil de la póliza contratada por SEBASTIAN RAMASCO PADILLA, NEGOCIOS INMOBILIARIOS.
+          Las expensas comunes ordinarias, los servicios de luz, gas, agua, teléfono, internet y cable correrán por cuenta exclusiva del LOCATARIO a partir de la fecha de entrega del inmueble. Las expensas comunes extraordinarias y los impuestos provinciales y municipales que graven el inmueble estarán a cargo del LOCADOR. EL LOCATARIO se obliga a abonar el proporcional del seguro de incendio y responsabilidad civil de la póliza contratada por {a.razonSocial}.
         </p>
 
         <p className="clausula-titulo">Novena — Reparaciones y reformas</p>
@@ -392,7 +394,7 @@ function ContratoPreview({ r }) {
 
         <p className="clausula-titulo">Duodécima — Comisión inmobiliaria</p>
         <p className="recibo-body">
-          EL LOCATARIO abona en este acto a SEBASTIAN RAMASCO PADILLA, NEGOCIOS INMOBILIARIOS, en concepto de comisión inmobiliaria, el cinco por ciento más IVA (5&nbsp;% + IVA) del total de la operación. Asimismo, durante la vigencia del contrato, abonará mensualmente la cuota del seguro de incendio y responsabilidad civil, cuya póliza será contratada por la inmobiliaria.
+          EL LOCATARIO abona en este acto a {a.razonSocial}, en concepto de comisión inmobiliaria, el {a.comisionTexto} del total de la operación. Asimismo, durante la vigencia del contrato, abonará mensualmente la cuota del seguro de incendio y responsabilidad civil, cuya póliza será contratada por la inmobiliaria.
         </p>
 
         <p className="clausula-titulo">Decimotercera — Firma electrónica</p>
@@ -402,7 +404,7 @@ function ContratoPreview({ r }) {
 
         <p className="clausula-titulo">Decimocuarta — Jurisdicción</p>
         <p className="recibo-body">
-          Para todos los efectos legales emergentes del presente contrato, las partes se someten a la jurisdicción de los Tribunales Ordinarios de la ciudad de Rosario, provincia de Santa Fe, renunciando a cualquier otro fuero o jurisdicción que pudiera corresponderles.
+          Para todos los efectos legales emergentes del presente contrato, las partes se someten a la jurisdicción de los {a.jurisdiccion}, renunciando a cualquier otro fuero o jurisdicción que pudiera corresponderles.
         </p>
 
         <p className="recibo-body" style={{ marginTop: 12 }}>
@@ -427,9 +429,9 @@ function ContratoPreview({ r }) {
           <div className="recibo-firma" style={{ marginTop: 24 }}>
             <div className="recibo-firma-bloque">
               <div className="recibo-firma-linea" />
-              <p className="recibo-firma-nombre">Sebastián Ramasco Padilla</p>
+              <p className="recibo-firma-nombre">{a.corredorNombre}</p>
               <p className="recibo-firma-cargo">Corredor Público Inmobiliario</p>
-              <p className="recibo-firma-mat">Mat. C.I.C.I.C.P.S.F. N° 829</p>
+              <p className="recibo-firma-mat">{a.corredorMatricula}</p>
             </div>
             <div className="recibo-firma-bloque">
               <div className="recibo-firma-linea" />
@@ -498,6 +500,47 @@ function Reservas() {
 
   const [confirmDelete, setConfirmDelete] = useState(null);
   const fileInputRef = useRef();
+  // PRO-095: datos de la inmobiliaria para los documentos; contrato desde reserva aprobada
+  const [agencia, setAgencia] = useState(AGENCIA_VACIA);
+  const [contractFor, setContractFor] = useState(null);
+  const [contractForm, setContractForm] = useState({ startDate: '', endDate: '', monthlyAmount: '' });
+  const [actionLoading, setActionLoading] = useState(false);
+  const [info, setInfo] = useState(null);
+
+  useEffect(() => {
+    api.get('/api/settings/agency').then(r => setAgencia(agenciaParaDocumentos(r.data))).catch(() => {});
+  }, []);
+
+  const changeStatus = async (r, status) => {
+    setActionLoading(true);
+    try {
+      const updated = await reservaService.updateStatus(r.id, status);
+      setReservas(prev => prev.map(x => x.id === r.id ? { ...x, status: updated.status } : x));
+    } catch (err) { setError(errorMessage(err, 'No se pudo cambiar el estado')); }
+    finally { setActionLoading(false); }
+  };
+
+  const createContract = async () => {
+    setActionLoading(true);
+    try {
+      await reservaService.createContract(contractFor.id, {
+        startDate: contractForm.startDate, endDate: contractForm.endDate,
+        monthlyAmount: contractForm.monthlyAmount ? Number(contractForm.monthlyAmount) : null,
+      });
+      setContractFor(null);
+      setInfo('Contrato creado. Lo ves en la sección Contratos.');
+    } catch (err) { setError(errorMessage(err, 'No se pudo crear el contrato')); }
+    finally { setActionLoading(false); }
+  };
+
+  const downloadPdf = async (r, doc) => {
+    try {
+      const res = await api.get(`/api/reservas/${r.id}/pdf/${doc}`, { responseType: 'blob' });
+      const url = URL.createObjectURL(res.data);
+      window.open(url, '_blank', 'noopener');
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    } catch (err) { setError(errorMessage(err, 'No se pudo generar el PDF')); }
+  };
 
   const loadReservas = async () => {
     setIsLoading(true); setError(null);
@@ -627,6 +670,35 @@ function Reservas() {
             <button onClick={() => setError(null)}>×</button>
           </div>
         )}
+        {info && (
+          <div className="error-banner" style={{ background: 'var(--color-success-bg, #e6f4ee)' }}>
+            <span>{info}</span>
+            <button onClick={() => setInfo(null)}>×</button>
+          </div>
+        )}
+        {contractFor && (
+          <div className="modal-overlay" onClick={() => setContractFor(null)}>
+            <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 460 }}>
+              <div className="modal-header">
+                <h2>Generar contrato</h2>
+                <button className="modal-close" onClick={() => setContractFor(null)}>×</button>
+              </div>
+              <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <p>{contractFor.nombre} {contractFor.apellido} — {contractFor.propiedad}</p>
+                <label>Inicio <input type="date" value={contractForm.startDate} onChange={e => setContractForm(f => ({ ...f, startDate: e.target.value }))} /></label>
+                <label>Fin <input type="date" value={contractForm.endDate} onChange={e => setContractForm(f => ({ ...f, endDate: e.target.value }))} /></label>
+                <label>Alquiler mensual <input type="number" min="0" value={contractForm.monthlyAmount} onChange={e => setContractForm(f => ({ ...f, monthlyAmount: e.target.value }))} /></label>
+                <p className="text-muted" style={{ fontSize: 'var(--font-size-sm)' }}>El inquilino tiene que estar dado de alta con el mismo email de la reserva.</p>
+              </div>
+              <div className="modal-actions">
+                <button className="btn-secondary" onClick={() => setContractFor(null)}>Cancelar</button>
+                <button className="btn-primary" disabled={actionLoading || !contractForm.startDate || !contractForm.endDate} onClick={createContract}>
+                  {actionLoading ? 'Creando...' : 'Crear contrato'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {isLoading ? (
           <div className="loading-container">
@@ -662,6 +734,17 @@ function Reservas() {
                           <button className="action-btn" onClick={() => openPreview(r.id, 'fc1')} title="Recibo de Reserva (FC1)">FC1</button>
                           <button className="action-btn" onClick={() => openPreview(r.id, 'fc10')} title="Entrega de Copia (FC10)">FC10</button>
                           <button className="action-btn" onClick={() => openPreview(r.id, 'ctr')} title="Contrato de Locación (CTR)">CTR</button>
+                          <button className="action-btn" onClick={() => downloadPdf(r, 'fc1')} title="Descargar FC1 en PDF">PDF</button>
+                          {r.status === 'PENDIENTE' && <>
+                            <button className="action-btn" disabled={actionLoading} onClick={() => changeStatus(r, 'APROBADA')} title="Aprobar">Aprobar</button>
+                            <button className="action-btn danger" disabled={actionLoading} onClick={() => changeStatus(r, 'RECHAZADA')} title="Rechazar">Rechazar</button>
+                          </>}
+                          {r.status === 'APROBADA' && <>
+                            <button className="action-btn" onClick={() => { setContractFor(r); setContractForm({ startDate: '', endDate: '', monthlyAmount: r.monto || '' }); }} title="Generar contrato">Contrato</button>
+                          </>}
+                          {(r.status === 'PENDIENTE' || r.status === 'APROBADA') && (
+                            <button className="action-btn danger" disabled={actionLoading} onClick={() => changeStatus(r, 'CANCELADA')} title="Cancelar">Cancelar</button>
+                          )}
                           <button className="action-btn delete" onClick={() => setConfirmDelete(r)} title="Eliminar">🗑</button>
                         </div>
                       </td>
@@ -888,7 +971,7 @@ function Reservas() {
               {previewLoading ? (
                 <div className="loading-container"><div className="loading-spinner" /></div>
               ) : (
-                <DocComponent r={selectedReserva} />
+                <DocComponent r={selectedReserva} a={agencia} />
               )}
             </div>
           </div>
