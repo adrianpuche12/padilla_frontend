@@ -82,6 +82,12 @@ function Layout({ children, title }) {
               </NavLink>
             )}
 
+            {roles.some(r => String(r).toUpperCase() === 'PLATFORM_ADMIN') && (
+              <NavLink to="/platform" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+                Plataforma
+              </NavLink>
+            )}
+
             {isSuperAdmin() && (
               <NavLink to="/settings" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
                 Configuración
