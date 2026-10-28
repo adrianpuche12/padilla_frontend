@@ -7,6 +7,16 @@ const clientService = {
     return response.data;
   },
 
+  /** PRO-094: pagina server-side ({content, totalElements, totalPages, page, size}). */
+  async getClientsPage({ page = 0, size = 25, role, q, active } = {}) {
+    const params = { page, size };
+    if (role) params.role = role;
+    if (q) params.q = q;
+    if (active !== undefined) params.active = active;
+    const response = await api.get('/api/clients', { params });
+    return response.data;
+  },
+
   async getClient(id) {
     const response = await api.get(`/api/clients/${id}`);
     return response.data;
