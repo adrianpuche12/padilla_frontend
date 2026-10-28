@@ -1,10 +1,13 @@
 import Layout from '../components/Layout';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
+import AgencySettingsSection from '../components/AgencySettingsSection';
 import './Settings.css';
 
 function Settings() {
   const { theme, setTheme } = useTheme();
   const isDark = theme === 'dark';
+  const { isSuperAdmin } = useAuth();
 
   return (
     <Layout title="Configuración">
@@ -39,6 +42,12 @@ function Settings() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* PRO-100: datos de la inmobiliaria, reglas operativas y plan */}
+        <div className="settings-section">
+          <h3 className="settings-section-title">Inmobiliaria</h3>
+          <AgencySettingsSection canEdit={isSuperAdmin()} />
         </div>
       </div>
     </Layout>

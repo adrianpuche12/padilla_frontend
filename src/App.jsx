@@ -9,6 +9,7 @@ import Contracts from './pages/Contracts';
 import Tickets from './pages/Tickets';
 import Reservas from './pages/Reservas';
 import Settings from './pages/Settings';
+import Platform from './pages/Platform';
 import ChangePassword from './pages/ChangePassword';
 import ForgotPassword from './pages/ForgotPassword';
 import PrivateRoute from './components/PrivateRoute';
@@ -115,6 +116,16 @@ function App() {
         element={
           <PrivateRoute roles={[ROLES.SUPER_ADMIN]}>
             <Settings />
+          </PrivateRoute>
+        }
+      />
+
+      {/* PRO-100: alta de inmobiliarias (personal de plataforma) */}
+      <Route
+        path="/platform"
+        element={
+          <PrivateRoute roles={['PLATFORM_ADMIN']}>
+            <Platform />
           </PrivateRoute>
         }
       />
