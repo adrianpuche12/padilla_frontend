@@ -7,6 +7,8 @@ import propertyService from '../services/propertyService';
 import meService from '../services/meService';
 import { errorMessage } from '../services/api';
 import { statusActions } from './ticketActions';
+import TicketExtras from '../components/TicketExtras';
+import VoiceTicketWizard from '../components/VoiceTicketWizard';
 import './Tickets.css';
 
 const STATUS_LABEL = {
@@ -54,6 +56,7 @@ function Tickets() {
 
   // Create ticket modal
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showVoice, setShowVoice] = useState(false);
   const [createForm, setCreateForm] = useState({ title: '', description: '', category: 'PLOMERIA', priority: 'NORMAL', propertyId: '' });
   const [createLoading, setCreateLoading] = useState(false);
   const [createError, setCreateError] = useState(null);
@@ -257,6 +260,9 @@ function Tickets() {
           {canCreate && (
             <button className="btn-primary" onClick={() => setShowCreateForm(true)}>+ Nuevo ticket</button>
           )}
+          {isTenant && properties.length > 0 && (
+            <button className="btn-secondary" onClick={() => setShowVoice(true)} style={{ fontSize: 16 }}>🎙️ Pedir por voz</button>
+          )}
         </div>
 
         {error && (
@@ -337,6 +343,11 @@ function Tickets() {
           </div>
         )}
       </div>
+
+      {showVoice && (
+        <VoiceTicketWizard propertyId={createForm.propertyId || properties[0]?.id} onClose={() => setShowVoice(false)}
+                           onCreated={() => { setShowVoice(false); loadTickets(); }} />
+      )}
 
       {/* Modal crear ticket */}
       {showCreateForm && (
@@ -425,6 +436,11 @@ function Tickets() {
                 {selectedTicket.rejectionReason && <span className="rejection-reason"><strong>Razon rechazo:</strong> {selectedTicket.rejectionReason}</span>}
               </div>
               <p className="ticket-description">{selectedTicket.description}</p>
+
+              {/* PRO-103: fotos, visita, presupuestos y costo final */}
+              <TicketExtras ticket={selectedTicket} isAdmin={isAdmin} isOwner={isOwner} isTenant={isTenant}
+                            isProvider={isProvider} userId={userId}
+                            onTicketUpdated={(u) => { setSelectedTicket(u); setTickets(prev => prev.map(x => x.id === u.id ? u : x)); }} />
 
               {isAdmin && (
                 <div className="comments-section">
