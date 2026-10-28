@@ -50,7 +50,9 @@
 }
 
 .sidebar-link {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding: 10px var(--spacing-lg);
   color: rgba(255, 255, 255, 0.55);
   text-decoration: none;
@@ -250,4 +252,18 @@
   .app-content {
     padding: var(--spacing-md);
   }
+}
+
+/* PRO-107: íconos del menú */
+.sidebar-icon {
+  flex-shrink: 0;
+}
+
+.sidebar.collapsed .sidebar-label {
+  display: none;
+}
+
+.sidebar.collapsed .sidebar-link {
+  justify-content: center;
+  padding: 10px 0;
 }

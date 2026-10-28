@@ -20,6 +20,13 @@ export const PANTALLAS = [
   { id: 'contracts', titulo: 'Contratos' },
   { id: 'tickets', titulo: 'Tickets' },
   { id: 'reservas', titulo: 'Reservas' },
+  { id: 'my-home', titulo: 'Mis propiedades / Mi vivienda' },
+  { id: 'reports', titulo: 'Reportes' },
+  { id: 'audit', titulo: 'Auditoría' },
+  { id: 'notifications', titulo: 'Notificaciones' },
+  { id: 'profile', titulo: 'Mi perfil' },
+  { id: 'settings', titulo: 'Configuración' },
+  { id: 'platform', titulo: 'Plataforma' },
   { id: 'general', titulo: 'General' },
 ];
 
@@ -55,9 +62,10 @@ export const TEMAS = [
       'SUPER ADMIN: todo, incluida Configuración, y administra a los MANAGER y ADMIN.',
       'MANAGER: todo el trabajo diario y administra a los ADMIN.',
       'ADMIN: Usuarios (solo lectura de los de rango menor), Clientes, Proveedores, Propiedades, Contratos, Tickets y Reservas.',
-      'Inquilino: ve el Dashboard y sus Tickets; carga pedidos de arreglo con «+ Nuevo ticket» y comenta.',
-      'Proveedor: ve el Dashboard y los tickets que tiene asignados.',
-      'Propietario: ve el Dashboard.',
+      'Inquilino: ve el Dashboard, «Mi vivienda» y sus Tickets; carga pedidos de arreglo con «+ Nuevo ticket» o «🎙️ Pedir por voz» y comenta.',
+      'Proveedor: ve el Dashboard y los tickets que tiene asignados; manda presupuestos y coordina visitas.',
+      'Propietario: ve el Dashboard, «Mis propiedades», los tickets de sus propiedades y su informe anual en «Reportes».',
+      'Reportes: SUPER ADMIN, MANAGER y ADMIN. Auditoría: solo SUPER ADMIN y MANAGER.',
     ],
     consejos: ['Cada uno ve y administra solo a los usuarios de rango menor al suyo.'],
   },
@@ -344,5 +352,174 @@ export const TEMAS = [
       'El tacho borra la reserva. Pide confirmación y no se puede deshacer.',
     ],
     consejos: ['En el video de ayuda el documento aparece tapado: lleva los datos de la inmobiliaria.'],
+  },
+
+  // ───────────────────────────── Dashboard (PRO-105 y PRO-106)
+  {
+    id: 'dashboard-personalizar',
+    pantalla: 'dashboard',
+    roles: null,
+    titulo: 'Personalizar el Dashboard',
+    resumen: 'Elegir qué cuadros ver y en qué orden.',
+    pasos: [
+      'En el Dashboard tocá «⚙️ Personalizar dashboard».',
+      'Aparece la lista de cuadros disponibles para tu rol. Tildá los que querés ver y destildá los que no.',
+      'Con ↑ y ↓ cambiás el orden.',
+      'Tocá «Guardar». La próxima vez que entres, el Dashboard se ve igual.',
+    ],
+    consejos: ['Cada rol tiene sus cuadros: la inmobiliaria ve tickets, propiedades y proveedores; el propietario, el inquilino y el proveedor ven los de su cuenta.'],
+  },
+  {
+    id: 'encuesta',
+    pantalla: 'dashboard',
+    roles: ['OWNER', 'TENANT'],
+    titulo: 'Calificar un arreglo terminado',
+    resumen: 'La encuesta de 1 a 5 estrellas al cerrarse un ticket.',
+    pasos: [
+      'Cuando la inmobiliaria cierra un ticket tuyo, en el Dashboard aparece «¿Cómo resolvimos tu pedido?».',
+      'Tocá las estrellas: 1 es muy mal y 5 es excelente.',
+      'Si querés, escribí un comentario.',
+      'Tocá «Enviar». La encuesta desaparece y queda registrada.',
+    ],
+    consejos: ['Con 1 o 2 estrellas, la inmobiliaria recibe un aviso urgente para revisar el caso.'],
+  },
+
+  // ───────────────────────────── Tickets (PRO-103)
+  {
+    id: 'tickets-voz',
+    pantalla: 'tickets',
+    roles: ['TENANT', 'OWNER'],
+    titulo: 'Pedir un arreglo por voz',
+    resumen: 'Cuatro pasos grandes y simples, dictando en vez de escribir.',
+    pasos: [
+      'En «Tickets» tocá «🎙️ Pedir por voz».',
+      'Paso 1, «¿Qué problema tenés?»: tocá el tipo de problema.',
+      'Paso 2, «Contanos qué pasa»: dictá o escribí qué pasa y tocá «Siguiente».',
+      'Paso 3: si querés, sumá una foto. Si no, tocá «Saltar este paso».',
+      'Paso 4, «Revisá tu pedido»: si algo está mal, «✏️ Editar algo». Si está bien, «✅ Enviar pedido».',
+    ],
+    consejos: ['Si tu navegador no permite dictar, el sistema te deja escribirlo.'],
+  },
+  {
+    id: 'tickets-presupuestos',
+    pantalla: 'tickets',
+    roles: ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'PROVIDER'],
+    titulo: 'Presupuestos, visita y costo final',
+    resumen: 'El proveedor presupuesta, la inmobiliaria aprueba y se registra el costo.',
+    pasos: [
+      'Abrí el ticket. Abajo está la sección «Presupuestos».',
+      'Proveedor: cargá el monto y el detalle, y tocá «Enviar presupuesto».',
+      'Inmobiliaria: en cada presupuesto tocá «Aprobar» o «Rechazar».',
+      'Con «Coordinar visita» y «Guardar fecha» queda la fecha en que va el proveedor.',
+      'Al terminar el trabajo, cargá el «Costo final» y tocá «Guardar costo».',
+    ],
+    consejos: ['Si el presupuesto supera el monto crítico de la Configuración, se avisa a la supervisión.'],
+  },
+
+  // ───────────────────────────── Mis propiedades / Mi vivienda (PRO-102)
+  {
+    id: 'mi-vivienda',
+    pantalla: 'my-home',
+    roles: ['OWNER', 'TENANT'],
+    titulo: 'Mis propiedades / Mi vivienda',
+    resumen: 'Tus propiedades o tu vivienda, con sus contratos.',
+    pasos: [
+      'Tocá «Mis propiedades» (propietario) o «Mi vivienda» (inquilino) en el menú.',
+      'Arriba están tus propiedades o la vivienda que alquilás.',
+      'Debajo están los contratos, con fechas, alquiler y estado.',
+    ],
+    consejos: ['Si falta algún dato o no está bien, avisale a la inmobiliaria: ellos lo corrigen.'],
+  },
+
+  // ───────────────────────────── Reportes y Auditoría (PRO-106)
+  {
+    id: 'reportes',
+    pantalla: 'reports',
+    roles: ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'OWNER'],
+    titulo: 'Sacar un reporte y exportarlo',
+    resumen: 'Tickets, costos, proveedores, eficiencia e informe anual, en Excel o PDF.',
+    pasos: [
+      'Entrá a «Reportes» y elegí el reporte.',
+      'Completá los filtros que necesites: fechas, tipo de servicio, costo, puntuación, año o propietario.',
+      'Tocá «Ver reporte» para verlo en pantalla.',
+      'Con «Exportar Excel» o «Exportar PDF» se descarga el archivo con los mismos filtros.',
+    ],
+    consejos: [
+      'Si no ponés fechas, el reporte toma los últimos 90 días.',
+      'El propietario ve solo su informe anual. «Eficiencia operativa» la ven el SUPER ADMIN y el MANAGER.',
+    ],
+  },
+  {
+    id: 'auditoria',
+    pantalla: 'audit',
+    roles: ['SUPER_ADMIN', 'MANAGER'],
+    titulo: 'Ver quién hizo qué (Auditoría)',
+    resumen: 'El registro de los cambios importantes del sistema.',
+    pasos: [
+      'Entrá a «Auditoría».',
+      'Cada fila dice cuándo, quién, con qué rol, qué hizo y el detalle (por ejemplo, de qué estado a qué estado pasó un ticket).',
+      'Filtrá por sección (tickets, usuarios, contratos, reservas, configuración) y por fechas.',
+    ],
+    consejos: ['El registro no se puede editar ni borrar desde el sistema.'],
+  },
+
+  // ───────────────────────────── Notificaciones y perfil (PRO-101 y PRO-104)
+  {
+    id: 'notificaciones',
+    pantalla: 'notifications',
+    roles: null,
+    titulo: 'Notificaciones',
+    resumen: 'La campana, la bandeja y los avisos por mail.',
+    pasos: [
+      'Arriba a la derecha, la campana 🔔 muestra cuántos avisos tenés sin leer. Tocala para abrir la bandeja.',
+      'Tocá un aviso para marcarlo como leído e ir a lo que avisa (un ticket, un contrato, una reserva).',
+      '«Marcar todas como leídas» limpia la bandeja. «Solo sin leer» filtra.',
+      'En «Preferencias» elegís si querés avisos por mail y un resumen diario o semanal. Tocá «Guardar preferencias».',
+    ],
+    consejos: ['Algunos avisos importantes llegan por mail aunque lo apagues. La campana se actualiza sola cada minuto.'],
+  },
+  {
+    id: 'perfil',
+    pantalla: 'profile',
+    roles: null,
+    titulo: 'Mi perfil y cambiar la contraseña',
+    resumen: 'Tus datos de contacto y tu contraseña.',
+    pasos: [
+      'Tocá tu nombre arriba a la derecha.',
+      'En «Mis datos» corregí nombre, teléfono, domicilio, ciudad y provincia, y tocá «Guardar».',
+      'En «Cambiar contraseña» escribí la actual y dos veces la nueva.',
+    ],
+    consejos: ['El email no se cambia desde acá: es tu usuario. Pedíselo a la inmobiliaria.'],
+  },
+
+  // ───────────────────────────── Configuración y Plataforma (PRO-100)
+  {
+    id: 'configuracion',
+    pantalla: 'settings',
+    roles: ['SUPER_ADMIN'],
+    titulo: 'Configuración de la inmobiliaria',
+    resumen: 'Datos que van en los documentos, color de marca y reglas operativas.',
+    pasos: [
+      'Entrá a «Configuración».',
+      'En «Datos de la inmobiliaria» cargá lo que sale en los recibos y contratos.',
+      'Elegí el «Color de marca».',
+      'En «Reglas operativas»: horas de SLA para tomar un ticket, monto crítico de presupuestos, comisión y horario de los mails.',
+      'Tocá «Guardar configuración».',
+    ],
+    consejos: ['Cada cambio queda registrado en la Auditoría.'],
+  },
+  {
+    id: 'plataforma',
+    pantalla: 'platform',
+    roles: ['PLATFORM_ADMIN'],
+    titulo: 'Dar de alta una inmobiliaria',
+    resumen: 'Solo para el personal de Propero.',
+    pasos: [
+      'Entrá a «Plataforma».',
+      'En «Dar de alta una inmobiliaria» completá el nombre, el identificador (en minúsculas y con guiones), el plan y el nombre y email del administrador.',
+      'Tocá «Crear inmobiliaria». El administrador recibe sus datos de acceso por mail.',
+      'Abajo, en «Inmobiliarias», está la lista de las que ya están dadas de alta.',
+    ],
+    consejos: ['Cada inmobiliaria ve solo sus datos: nunca los de otra.'],
   },
 ];

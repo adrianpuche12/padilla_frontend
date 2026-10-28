@@ -31,6 +31,18 @@ describe('paginacion server-side (PRO-094)', () => {
     expect(fetchPage).toHaveBeenLastCalledWith(expect.objectContaining({ page: 1, size: 2 }));
   });
 
+  it('un cambio de pagina apenas abre la pantalla no se pierde (debounce sin busqueda)', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const fetchPage = vi.fn(async ({ page, q }) => pagina(page, q));
+    render(<Lista fetchPage={fetchPage} />);
+    await screen.findByText('Item 1');
+    await act(async () => { screen.getByLabelText('Página siguiente').click(); });
+    await act(async () => { vi.advanceTimersByTime(400); });
+    expect(await screen.findByText('Item 3')).toBeInTheDocument();
+    expect(fetchPage).toHaveBeenLastCalledWith(expect.objectContaining({ page: 1 }));
+    vi.useRealTimers();
+  });
+
   it('la busqueda espera a que se deje de escribir y vuelve a la pagina 0', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     const fetchPage = vi.fn(async ({ page, q }) => pagina(page, q));

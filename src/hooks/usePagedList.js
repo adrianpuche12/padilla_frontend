@@ -17,10 +17,13 @@ export default function usePagedList(fetchPage, { size = 25, filters = {} } = {}
   const fetchRef = useRef(fetchPage);
   fetchRef.current = fetchPage;
 
+  // Solo si la búsqueda cambió: si no, al montar volvía a la página 0 a los 350 ms
+  // y se perdía un cambio de página hecho antes (PRO-107).
   useEffect(() => {
+    if (q.trim() === debouncedQ) return undefined;
     const id = setTimeout(() => { setDebouncedQ(q.trim()); setPage(0); }, 350);
     return () => clearTimeout(id);
-  }, [q]);
+  }, [q, debouncedQ]);
 
   useEffect(() => { setPage(0); }, [filtersKey]);
 

@@ -9,7 +9,8 @@ vi.mock('../services/clientService', () => ({ default: { getClients: vi.fn(async
 vi.mock('../context/AuthContext', () => ({ useAuth: () => auth }));
 vi.mock('../components/Layout', () => ({ default: ({ children }) => <div>{children}</div> }));
 vi.mock('../components/Pagination', () => ({ default: () => null }));
-const { default: Reports, reportParams } = await import('./Reports');
+const { default: Reports } = await import('./Reports');
+const { reportParams } = await import('./reportes');
 const { default: Audit } = await import('./Audit');
 const { default: PendingSurveys } = await import('../components/PendingSurveys');
 
