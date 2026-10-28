@@ -26,6 +26,12 @@ const reservaService = {
     return response.data;
   },
 
+  /** PRO-095: contrato precargado desde una reserva APROBADA. */
+  async createContract(id, data) {
+    const response = await api.post(`/api/reservas/${id}/contract`, data);
+    return response.data;
+  },
+
   async deleteReserva(id) {
     await api.delete(`/api/reservas/${id}`);
   },

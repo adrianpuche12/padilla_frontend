@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import authService from '../services/authService';
+import { BRAND } from '../brand/brand';
 import './ForgotPassword.css';
 
 function ForgotPassword() {
@@ -30,7 +31,7 @@ function ForgotPassword() {
       <div className="fp-card">
 
         <div className="fp-header">
-          <h1>Padilla</h1>
+          <h1>{BRAND.name}</h1>
           <p>Sistema de Gestión Inmobiliaria</p>
         </div>
 
