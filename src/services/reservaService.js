@@ -1,55 +1,38 @@
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8080';
-
-const getAuthHeader = () => {
-  const token = localStorage.getItem('access_token');
-  return { Authorization: `Bearer ${token}` };
-};
+// PRO-090: usa el cliente HTTP unico (refresh de token incluido)
+import api from './api';
 
 const reservaService = {
   async getReservas(status = null) {
     const params = {};
     if (status) params.status = status;
-    const response = await axios.get(`${API_URL}/api/reservas`, {
-      headers: getAuthHeader(),
+    const response = await api.get(`/api/reservas`, {
       params,
     });
     return response.data;
   },
 
   async getReserva(id) {
-    const response = await axios.get(`${API_URL}/api/reservas/${id}`, {
-      headers: getAuthHeader(),
-    });
+    const response = await api.get(`/api/reservas/${id}`);
     return response.data;
   },
 
   async createReserva(data) {
-    const response = await axios.post(`${API_URL}/api/reservas`, data, {
-      headers: getAuthHeader(),
-    });
+    const response = await api.post(`/api/reservas`, data);
     return response.data;
   },
 
   async updateStatus(id, status) {
-    const response = await axios.patch(`${API_URL}/api/reservas/${id}/status`, { status }, {
-      headers: getAuthHeader(),
-    });
+    const response = await api.patch(`/api/reservas/${id}/status`, { status });
     return response.data;
   },
 
   async deleteReserva(id) {
-    await axios.delete(`${API_URL}/api/reservas/${id}`, {
-      headers: getAuthHeader(),
-    });
+    await api.delete(`/api/reservas/${id}`);
   },
 
   async readDni(base64, mimeType = 'image/jpeg') {
-    const response = await axios.post(
-      `${API_URL}/api/reservas/read-dni`,
-      { base64, mimeType },
-      { headers: getAuthHeader() }
+    const response = await api.post(`/api/reservas/read-dni`,
+      { base64, mimeType }
     );
     return response.data;
   },
