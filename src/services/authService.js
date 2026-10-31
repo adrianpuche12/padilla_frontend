@@ -1,6 +1,8 @@
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL ?? '';
+// PRO-111 (B-09): sin timeout, "Ingresando..." podía quedar para siempre
+const http = axios.create({ baseURL: API_URL, timeout: 15000 });
 
 const authService = {
   /**
@@ -10,7 +12,7 @@ const authService = {
    * @returns {Promise<{access_token, refresh_token, expires_in}>}
    */
   async login(username, password) {
-    const response = await axios.post(`${API_URL}/api/auth/login`, {
+    const response = await http.post('/api/auth/login', {
       username,
       password,
     });
@@ -23,7 +25,7 @@ const authService = {
    * @returns {Promise<{access_token, refresh_token, expires_in}>}
    */
   async refresh(refreshToken) {
-    const response = await axios.post(`${API_URL}/api/auth/refresh`, {
+    const response = await http.post('/api/auth/refresh', {
       refresh_token: refreshToken,
     });
     return response.data;
@@ -34,7 +36,7 @@ const authService = {
    * @param {string} refreshToken
    */
   async logout(refreshToken) {
-    await axios.post(`${API_URL}/api/auth/logout`, {
+    await http.post('/api/auth/logout', {
       refresh_token: refreshToken,
     });
   },
@@ -93,7 +95,7 @@ const authService = {
    * @returns {Promise<void>}
    */
   async forgotPassword(email) {
-    await axios.post(`${API_URL}/api/auth/forgot-password`, { email });
+    await http.post('/api/auth/forgot-password', { email });
   },
 
   /**
@@ -103,7 +105,7 @@ const authService = {
    * @returns {Promise<void>}
    */
   async changePassword(newPassword, accessToken) {
-    const response = await axios.put(`${API_URL}/api/auth/change-password`,
+    const response = await http.put('/api/auth/change-password',
       { newPassword },
       { headers: { Authorization: `Bearer ${accessToken}` } }
     );

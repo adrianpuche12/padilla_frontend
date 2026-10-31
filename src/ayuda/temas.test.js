@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { PANTALLAS, TEMAS } from './temas';
 import { temasVisibles } from './ayuda';
-import { ICONOS } from '../components/SidebarIcon';
+import { NAV_ITEMS } from '../config/navConfig';
 
 describe('temas de ayuda (PRO-107)', () => {
   it('cada tema apunta a una pantalla conocida y los ids no se repiten', () => {
@@ -22,8 +22,11 @@ describe('temas de ayuda (PRO-107)', () => {
     expect(temasVisibles(TEMAS, ['MANAGER']).map(t => t.id)).toContain('auditoria');
   });
 
-  it('hay icono para cada seccion del menu', () => {
-    ['dashboard', 'users', 'clients', 'providers', 'properties', 'contracts', 'myHome', 'tickets', 'reservas',
-      'reports', 'audit', 'platform', 'settings'].forEach(i => expect(ICONOS).toContain(i));
+  it('cada seccion del menu tiene icono y una pantalla de ayuda', () => {
+    const pantallas = new Set(PANTALLAS.map(p => p.id));
+    NAV_ITEMS.forEach(i => {
+      expect(i.icon, i.to).toBeTruthy();
+      expect(pantallas.has(i.to.slice(1)), i.to).toBe(true);
+    });
   });
 });

@@ -4,10 +4,15 @@
   background: var(--bg-page);
 }
 
-/* Sidebar */
+/* Sidebar — usa --text-on-dark (siempre blanco) en vez de --text-inverse,
+   que en modo oscuro vale #0f1117 y dejaba el nombre de marca invisible (B-05) */
+/* PRO-111: el menu queda fijo al hacer scroll (antes, en paginas largas, quedaba vacio) */
 .sidebar {
   width: 220px;
-  min-height: 100vh;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  align-self: flex-start;
   background: var(--bg-dark);
   display: flex;
   flex-direction: column;
@@ -17,7 +22,7 @@
 }
 
 .sidebar.collapsed {
-  width: 56px;
+  width: 64px;
 }
 
 .sidebar-brand {
@@ -34,7 +39,7 @@
 }
 
 .sidebar-brand-text {
-  color: var(--text-inverse);
+  color: var(--text-on-dark);
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-bold);
   letter-spacing: 0.5px;
@@ -42,19 +47,31 @@
   overflow: hidden;
 }
 
+.sidebar.collapsed .sidebar-brand {
+  justify-content: center;
+  padding: var(--spacing-md) 0;
+}
+
+.sidebar.collapsed .sidebar-brand-text,
+.sidebar.collapsed .sidebar-link-label {
+  display: none;
+}
+
 .sidebar-nav {
   display: flex;
   flex-direction: column;
   padding: var(--spacing-md) 0;
   gap: var(--spacing-xs);
+  overflow-y: auto;
+  flex: 1;
 }
 
 .sidebar-link {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--spacing-sm);
   padding: 10px var(--spacing-lg);
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.6);
   text-decoration: none;
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
@@ -64,14 +81,28 @@
   white-space: nowrap;
 }
 
+.sidebar-link-icon {
+  flex-shrink: 0;
+}
+
+.sidebar.collapsed .sidebar-link {
+  justify-content: center;
+  padding: 12px 0;
+}
+
 .sidebar-link:hover {
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.92);
   background: rgba(255, 255, 255, 0.05);
   border-left-color: rgba(255, 255, 255, 0.2);
 }
 
+.sidebar-link:focus-visible {
+  outline: 2px solid var(--brand-color-accent);
+  outline-offset: -2px;
+}
+
 .sidebar-link.active {
-  color: var(--color-white);
+  color: var(--text-on-dark);
   background: rgba(255, 255, 255, 0.08);
   border-left-color: var(--brand-color-accent);
   font-weight: var(--font-weight-semibold);
@@ -82,17 +113,18 @@
   background: none;
   border: none;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.55);
   cursor: pointer;
   padding: var(--spacing-md);
-  font-size: var(--font-size-sm);
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   transition: color var(--transition-fast), background var(--transition-fast);
 }
 
 .sidebar-toggle:hover {
-  color: var(--text-inverse);
+  color: var(--text-on-dark);
   background: rgba(255, 255, 255, 0.08);
 }
 
@@ -107,7 +139,7 @@
 .app-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: var(--spacing-md);
   padding: 0 var(--spacing-xl);
   height: 60px;
   background: var(--bg-card);
@@ -117,17 +149,38 @@
   z-index: var(--z-sticky);
 }
 
+/* B-11: el título se trunca en vez de empujar los botones fuera de pantalla */
 .app-header-title {
+  flex: 1;
+  min-width: 0;
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
   color: var(--text-primary);
   margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .app-header-right {
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
+  flex-shrink: 0;
+}
+
+.header-profile-link {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+}
+
+.header-profile-link:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .header-username {
@@ -135,21 +188,44 @@
   color: var(--text-secondary);
 }
 
+.header-icon-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.header-icon-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
 .user-avatar {
   width: 36px;
   height: 36px;
   border-radius: var(--radius-full);
   background: var(--color-primary);
-  color: var(--text-inverse);
+  color: var(--text-on-dark);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-bold);
+  flex-shrink: 0;
 }
 
 .logout-button {
-  padding: var(--spacing-xs) var(--spacing-md);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  height: 36px;
+  padding: 0 var(--spacing-md);
   background: transparent;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
@@ -170,12 +246,10 @@
   overflow-y: auto;
 }
 
-/* Hamburguesa — oculto en desktop */
 .mobile-menu-btn {
   display: none;
 }
 
-/* Overlay — solo mobile */
 .sidebar-overlay {
   display: none;
 }
@@ -184,8 +258,6 @@
    MOBILE — breakpoint 768px
    ========================================== */
 @media (max-width: 768px) {
-
-  /* Sidebar como drawer (overlay) */
   .sidebar {
     position: fixed;
     top: 0;
@@ -201,12 +273,26 @@
     transform: translateX(0);
   }
 
-  /* Ocultar boton colapsar en mobile (no aplica) */
+  /* B-06: si se colapsó en desktop, en el drawer mobile igual se ven los textos */
+  .sidebar.collapsed .sidebar-brand-text,
+  .sidebar.collapsed .sidebar-link-label {
+    display: inline;
+  }
+
+  .sidebar.collapsed .sidebar-brand {
+    justify-content: flex-start;
+    padding: var(--spacing-md);
+  }
+
+  .sidebar.collapsed .sidebar-link {
+    justify-content: flex-start;
+    padding: 10px var(--spacing-lg);
+  }
+
   .sidebar-toggle {
     display: none;
   }
 
-  /* Overlay oscuro detras del sidebar */
   .sidebar-overlay {
     display: block;
     position: fixed;
@@ -215,16 +301,16 @@
     z-index: calc(var(--z-modal) - 1);
   }
 
-  /* Hamburguesa visible en mobile */
   .mobile-menu-btn {
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 40px;
+    height: 40px;
     background: none;
     border: none;
     color: var(--text-primary);
     cursor: pointer;
-    padding: var(--spacing-xs);
     border-radius: var(--radius-sm);
     transition: background var(--transition-fast);
     flex-shrink: 0;
@@ -234,9 +320,12 @@
     background: var(--bg-subtle);
   }
 
-  /* Header ajustado */
   .app-header {
     padding: 0 var(--spacing-md);
+    gap: var(--spacing-sm);
+  }
+
+  .app-header-right {
     gap: var(--spacing-sm);
   }
 
@@ -244,26 +333,18 @@
     font-size: var(--font-size-base);
   }
 
-  .header-username {
+  .header-username,
+  .logout-label {
     display: none;
   }
 
-  /* Contenido con menos padding */
+  .logout-button {
+    width: 36px;
+    padding: 0;
+    justify-content: center;
+  }
+
   .app-content {
     padding: var(--spacing-md);
   }
-}
-
-/* PRO-107: íconos del menú */
-.sidebar-icon {
-  flex-shrink: 0;
-}
-
-.sidebar.collapsed .sidebar-label {
-  display: none;
-}
-
-.sidebar.collapsed .sidebar-link {
-  justify-content: center;
-  padding: 10px 0;
 }

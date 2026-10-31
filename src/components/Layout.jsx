@@ -1,126 +1,141 @@
-import { useCallback, useState } from 'react';
-import NotificationBell from './NotificationBell';
-import SidebarIcon from './SidebarIcon';
+import { useCallback, useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { LogOut, Moon, Sun, ChevronsLeft, ChevronsRight, Menu } from 'lucide-react';
+import NotificationBell from './NotificationBell';
 import PanelDeAyuda from '../ayuda/PanelDeAyuda';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
+import { hasAnyRole } from '../auth/roles';
 import ProperoLogo from '../brand/ProperoLogo';
 import { BRAND } from '../brand/brand';
+import { NAV_ITEMS, navLabel } from '../config/navConfig';
 import './Layout.css';
 
-/** PRO-107: link del menú con ícono; con el menú achicado se ve solo el ícono (el nombre queda en el tooltip). */
-function SideLink({ to, icon, label }) {
-  return (
-    <NavLink to={to} title={label} className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
-      <SidebarIcon name={icon} />
-      <span className="sidebar-label">{label}</span>
-    </NavLink>
-  );
-}
+/**
+ * PRO-111: layout de la revisión 01 de Claude Design (íconos lucide, menú colapsable que se
+ * recuerda, botón de tema para todos, drawer mobile accesible) sumado a lo que ya tenía Propero:
+ * campana de notificaciones (PRO-104), acceso a Mi perfil (PRO-101) y panel de Ayuda.
+ */
+const COLLAPSE_KEY = 'propero_sidebar_collapsed';
+
+const getInitials = (username) => {
+  if (!username) return '?';
+  const parts = username.split(/[\s._-]+/).filter(Boolean);
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+  return username.substring(0, 2).toUpperCase();
+};
+
+const leerColapsado = () => {
+  try { return localStorage.getItem(COLLAPSE_KEY) === '1'; } catch { return false; }
+};
 
 function Layout({ children, title }) {
-  const { user, roles, logout, isSuperAdmin } = useAuth();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const { user, roles, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
+  const location = useLocation();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(leerColapsado);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [ayudaAbierta, setAyudaAbierta] = useState(false);
   const cerrarAyuda = useCallback(() => setAyudaAbierta(false), []);
-  const pantallaActual = useLocation().pathname.split('/')[1] || 'dashboard';
+  const pantallaActual = location.pathname.split('/')[1] || 'dashboard';
 
-  const canManageUsers = () => {
-    return roles.some(r =>
-      ['ADMIN', 'admin', 'MANAGER', 'manager', 'SUPER_ADMIN', 'super_admin'].includes(r)
-    );
-  };
+  useEffect(() => {
+    try { localStorage.setItem(COLLAPSE_KEY, sidebarCollapsed ? '1' : '0'); } catch { /* sin storage */ }
+  }, [sidebarCollapsed]);
 
-  const getInitials = (username) => {
-    if (!username) return '?';
-    const parts = username.split(/[\s._-]+/);
-    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
-    return username.substring(0, 2).toUpperCase();
-  };
+  // B-06: el drawer mobile se cierra al navegar
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
 
-  const handleLogout = async () => {
-    await logout();
-  };
+  // B-12: Esc cierra el drawer y el fondo no scrollea mientras está abierto
+  useEffect(() => {
+    if (!mobileMenuOpen) return undefined;
+    const onKey = (e) => { if (e.key === 'Escape') setMobileMenuOpen(false); };
+    document.addEventListener('keydown', onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [mobileMenuOpen]);
+
+  const items = NAV_ITEMS.filter((item) => !item.roles || hasAnyRole(roles, item.roles));
 
   return (
     <div className={`app-layout${sidebarCollapsed ? ' sidebar-is-collapsed' : ''}`}>
-      {mobileMenuOpen && (
-        <div className="sidebar-overlay" onClick={() => setMobileMenuOpen(false)} />
-      )}
-      <aside className={`sidebar${sidebarCollapsed ? ' collapsed' : ''}${mobileMenuOpen ? ' mobile-open' : ''}`}>
+      {mobileMenuOpen && <div className="sidebar-overlay" onClick={() => setMobileMenuOpen(false)} />}
+
+      <aside
+        id="app-sidebar"
+        className={`sidebar${sidebarCollapsed ? ' collapsed' : ''}${mobileMenuOpen ? ' mobile-open' : ''}`}
+        aria-label="Navegación principal"
+      >
         <div className="sidebar-brand">
           <ProperoLogo size={32} className="sidebar-brand-logo" />
-          {!sidebarCollapsed && <span className="sidebar-brand-text">{BRAND.name}</span>}
+          <span className="sidebar-brand-text">{BRAND.name}</span>
         </div>
 
+        {/* B-04: la navegación siempre se dibuja; colapsado solo se ocultan los textos */}
         <nav className="sidebar-nav">
-            <SideLink to="/dashboard" icon="dashboard" label="Dashboard" />
-
-            {canManageUsers() && (
-              <>
-                <SideLink to="/users" icon="users" label="Usuarios" />
-
-                <SideLink to="/clients" icon="clients" label="Clientes" />
-
-                <SideLink to="/providers" icon="providers" label="Proveedores" />
-
-                <SideLink to="/properties" icon="properties" label="Propiedades" />
-
-                <SideLink to="/contracts" icon="contracts" label="Contratos" />
-              </>
-            )}
-
-            {roles.some(r => ['OWNER', 'TENANT'].includes(String(r).toUpperCase())) && (
-              <SideLink to="/my-home" icon="myHome" label={roles.some(r => String(r).toUpperCase() === 'OWNER') ? 'Mis propiedades' : 'Mi vivienda'} />
-            )}
-
-            <SideLink to="/tickets" icon="tickets" label="Tickets" />
-
-            {canManageUsers() && (
-              <SideLink to="/reservas" icon="reservas" label="Reservas" />
-            )}
-
-            {roles.some(r => ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'OWNER'].includes(String(r).toUpperCase())) && (
-              <SideLink to="/reports" icon="reports" label="Reportes" />
-            )}
-
-            {roles.some(r => ['SUPER_ADMIN', 'MANAGER'].includes(String(r).toUpperCase())) && (
-              <SideLink to="/audit" icon="audit" label="Auditoría" />
-            )}
-
-            {roles.some(r => String(r).toUpperCase() === 'PLATFORM_ADMIN') && (
-              <SideLink to="/platform" icon="platform" label="Plataforma" />
-            )}
-
-            {isSuperAdmin() && (
-              <SideLink to="/settings" icon="settings" label="Configuración" />
-            )}
+          {items.map((item) => {
+            const label = navLabel(item, roles);
+            const Icon = item.icon;
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}
+                title={sidebarCollapsed ? label : undefined}
+                aria-label={sidebarCollapsed ? label : undefined}
+              >
+                <Icon size={18} className="sidebar-link-icon" aria-hidden="true" />
+                <span className="sidebar-link-label">{label}</span>
+              </NavLink>
+            );
+          })}
         </nav>
 
         <button
+          type="button"
           className="sidebar-toggle"
-          onClick={() => setSidebarCollapsed(prev => !prev)}
+          onClick={() => setSidebarCollapsed((prev) => !prev)}
+          aria-label={sidebarCollapsed ? 'Expandir menú' : 'Colapsar menú'}
           title={sidebarCollapsed ? 'Expandir menú' : 'Colapsar menú'}
         >
-          {sidebarCollapsed ? '▶' : '◀'}
+          {sidebarCollapsed ? <ChevronsRight size={18} aria-hidden="true" /> : <ChevronsLeft size={18} aria-hidden="true" />}
         </button>
       </aside>
 
       <div className="app-main">
         <header className="app-header">
-          <button className="mobile-menu-btn" onClick={() => setMobileMenuOpen(prev => !prev)} aria-label="Abrir menú">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect y="3" width="20" height="2" rx="1" fill="currentColor"/>
-              <rect y="9" width="20" height="2" rx="1" fill="currentColor"/>
-              <rect y="15" width="20" height="2" rx="1" fill="currentColor"/>
-            </svg>
+          <button
+            type="button"
+            className="mobile-menu-btn"
+            onClick={() => setMobileMenuOpen((prev) => !prev)}
+            aria-label="Abrir menú"
+            aria-expanded={mobileMenuOpen}
+            aria-controls="app-sidebar"
+          >
+            <Menu size={20} aria-hidden="true" />
           </button>
+
           <h1 className="app-header-title">{title}</h1>
+
           <div className="app-header-right">
             <NotificationBell />
-            <NavLink to="/profile" className="header-profile-link" title="Mi perfil" style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'inherit', textDecoration: 'none' }}>
-              <div className="user-avatar">{getInitials(user?.username)}</div>
+            <button
+              type="button"
+              className="header-icon-btn"
+              onClick={toggleTheme}
+              aria-label={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+              title={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
+            >
+              {theme === 'dark' ? <Sun size={18} aria-hidden="true" /> : <Moon size={18} aria-hidden="true" />}
+            </button>
+            <NavLink to="/profile" className="header-profile-link" title="Mi perfil">
+              <div className="user-avatar" aria-hidden="true">{getInitials(user?.username)}</div>
               <span className="header-username">{user?.username}</span>
             </NavLink>
             <button
@@ -132,15 +147,14 @@ function Layout({ children, title }) {
             >
               Ayuda
             </button>
-            <button onClick={handleLogout} className="logout-button">
-              Cerrar Sesion
+            <button type="button" onClick={logout} className="logout-button" aria-label="Cerrar sesión">
+              <LogOut size={16} aria-hidden="true" />
+              <span className="logout-label">Cerrar sesión</span>
             </button>
           </div>
         </header>
 
-        <main className="app-content">
-          {children}
-        </main>
+        <main className="app-content">{children}</main>
         {ayudaAbierta && <PanelDeAyuda actual={pantallaActual} roles={roles} onCerrar={cerrarAyuda} />}
       </div>
     </div>

@@ -101,7 +101,7 @@
 
 .dashboard-footer p {
   margin: 0;
-  color: var(--text-inverse);
+  color: var(--text-on-dark);
   opacity: 0.8;
   font-size: var(--font-size-sm);
 }

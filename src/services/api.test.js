@@ -64,13 +64,18 @@ describe('cliente HTTP unico (PRO-090)', () => {
     expect(llamadas).toBe(2);
   });
 
-  it('si el refresh falla cierra la sesion y va al login', async () => {
+  it('si el refresh falla cierra la sesion sin recargar la app (PRO-111, B-08)', async () => {
     localStorage.setItem('access_token', jwt(-60));
     localStorage.setItem('refresh_token', 'vencido');
     rawMock.onPost(/\/api\/auth\/refresh$/).reply(401, { error: 'SESSION_EXPIRED' });
+    const hrefAntes = window.location.href;
+    const onLogout = vi.fn();
+    window.addEventListener('propero:logout', onLogout);
     await expect(api.get('/api/tickets')).rejects.toThrow('Sesión expirada');
+    window.removeEventListener('propero:logout', onLogout);
     expect(localStorage.getItem('access_token')).toBeNull();
-    expect(window.location.href).toBe('/login');
+    expect(onLogout).toHaveBeenCalledTimes(1); // AuthContext cierra la sesion y PrivateRoute manda al login
+    expect(window.location.href).toBe(hrefAntes);
   });
 
   it('lee el mensaje del formato de error del backend', () => {

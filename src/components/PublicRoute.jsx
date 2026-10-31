@@ -2,7 +2,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 function PublicRoute({ children }) {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, mustChangePassword } = useAuth();
 
   // Mientras verifica la autenticacion, mostrar loading
   if (isLoading) {
@@ -15,7 +15,7 @@ function PublicRoute({ children }) {
 
   // Si ya esta autenticado, redirigir al dashboard
   if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to={mustChangePassword ? '/change-password' : '/dashboard'} replace />;
   }
 
   // Si no esta autenticado, mostrar el contenido (login)

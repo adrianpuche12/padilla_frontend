@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import authService from '../services/authService';
 import { BRAND } from '../brand/brand';
+import ProperoLogo from '../brand/ProperoLogo';
+import { describeHttpError } from '../utils/httpError';
 import './ForgotPassword.css';
 
 function ForgotPassword() {
@@ -18,9 +20,9 @@ function ForgotPassword() {
     try {
       await authService.forgotPassword(email.trim().toLowerCase());
       setSubmitted(true);
-    } catch {
-      // Mostrar error solo si hay un problema de conexión con el servidor
-      setError('No fue posible conectar con el servidor. Intentá de nuevo más tarde.');
+    } catch (err) {
+      // PRO-111 (A-04): antes cualquier error (email inválido, demasiados intentos, 500) decía "no se pudo conectar"
+      setError(describeHttpError(err));
     } finally {
       setIsLoading(false);
     }
@@ -31,8 +33,9 @@ function ForgotPassword() {
       <div className="fp-card">
 
         <div className="fp-header">
+          <ProperoLogo size={48} />
           <h1>{BRAND.name}</h1>
-          <p>Sistema de Gestión Inmobiliaria</p>
+          <p>{BRAND.tagline}</p>
         </div>
 
         <div className="fp-body">

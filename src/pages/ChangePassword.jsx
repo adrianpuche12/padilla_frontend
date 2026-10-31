@@ -1,7 +1,12 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import authService from '../services/authService';
+import { isTokenExpiring, refreshTokens } from '../services/api';
+import PasswordInput from '../components/PasswordInput';
+import ProperoLogo from '../brand/ProperoLogo';
+import { BRAND } from '../brand/brand';
+import { describeHttpError } from '../utils/httpError';
 import './ChangePassword.css';
 
 const RULES = [
@@ -14,20 +19,17 @@ const RULES = [
 function ChangePassword() {
   const [newPassword, setNewPassword]             = useState('');
   const [confirmPassword, setConfirmPassword]     = useState('');
-  const [showNewPassword, setShowNewPassword]     = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError]                         = useState('');
   const [isLoading, setIsLoading]                 = useState(false);
 
-  const { getAccessToken, logout } = useAuth();
+  const { getAccessToken, logout, isLoading: authLoading, isAuthenticated, completePasswordChange } = useAuth();
   const navigate = useNavigate();
 
-  // Verificar que hay token en localStorage (guarda sincrónicamente antes del state update)
-  useEffect(() => {
-    if (!getAccessToken()) {
-      navigate('/login', { replace: true });
-    }
-  }, []);
+  // PRO-111 (A-01): "Cerrar sesión" ahora lleva al login (antes se quedaba en esta pantalla sin sesión)
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login', { replace: true });
+  };
 
   const passedRules = RULES.filter((r) => r.test(newPassword));
   const allRulesPassed = passedRules.length === RULES.length;
@@ -47,28 +49,43 @@ function ChangePassword() {
 
     setIsLoading(true);
     try {
-      const accessToken = getAccessToken();
+      // PRO-111 (A-05): si la pantalla quedó abierta y el token venció, se renueva antes de enviar
+      let accessToken = getAccessToken();
+      if (isTokenExpiring(accessToken)) {
+        try {
+          accessToken = await refreshTokens();
+        } catch {
+          setError('Tu sesión venció. Volvé a iniciar sesión.');
+          return;
+        }
+      }
       await authService.changePassword(newPassword, accessToken);
+      completePasswordChange();
       navigate('/dashboard', { replace: true });
     } catch (err) {
       console.error('Error al cambiar contraseña:', err);
-      if (err.response?.data?.message) {
-        setError(err.response.data.message);
-      } else {
-        setError('Error al actualizar la contraseña. Intentá de nuevo.');
-      }
+      setError(describeHttpError(err));
     } finally {
       setIsLoading(false);
     }
   };
 
+  if (authLoading) {
+    return <div className="loading-container"><p>Cargando...</p></div>;
+  }
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
   return (
     <div className="cp-container">
       <div className="cp-card">
 
+        {/* PRO-111 (A-03): misma marca que el login (antes decía PADILLA) */}
         <div className="cp-header">
-          <h1>PADILLA</h1>
-          <p>Gestión Inmobiliaria</p>
+          <ProperoLogo size={48} />
+          <h1>{BRAND.name}</h1>
+          <p>{BRAND.tagline}</p>
         </div>
 
         <div className="cp-body">
@@ -85,39 +102,14 @@ function ChangePassword() {
 
             <div className="form-group">
               <label htmlFor="newPassword">Nueva contraseña</label>
-              <div className="password-input-wrapper">
-                <input
-                  type={showNewPassword ? 'text' : 'password'}
-                  id="newPassword"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Ingresá tu nueva contraseña"
-                  required
-                  disabled={isLoading}
-                  autoComplete="new-password"
-                />
-                <button
-                  type="button"
-                  className="password-toggle"
-                  onClick={() => setShowNewPassword(prev => !prev)}
-                  disabled={isLoading}
-                  tabIndex={-1}
-                  aria-label={showNewPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                >
-                  {showNewPassword ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
-                      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
-                      <line x1="1" y1="1" x2="23" y2="23"/>
-                    </svg>
-                  ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                      <circle cx="12" cy="12" r="3"/>
-                    </svg>
-                  )}
-                </button>
-              </div>
+              <PasswordInput
+                id="newPassword"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Ingresá tu nueva contraseña"
+                disabled={isLoading}
+                autoComplete="new-password"
+              />
             </div>
 
             {/* Indicador de requisitos */}
@@ -137,39 +129,14 @@ function ChangePassword() {
 
             <div className="form-group">
               <label htmlFor="confirmPassword">Confirmar contraseña</label>
-              <div className="password-input-wrapper">
-                <input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  id="confirmPassword"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Repetí tu nueva contraseña"
-                  required
-                  disabled={isLoading}
-                  autoComplete="new-password"
-                />
-                <button
-                  type="button"
-                  className="password-toggle"
-                  onClick={() => setShowConfirmPassword(prev => !prev)}
-                  disabled={isLoading}
-                  tabIndex={-1}
-                  aria-label={showConfirmPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                >
-                  {showConfirmPassword ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
-                      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
-                      <line x1="1" y1="1" x2="23" y2="23"/>
-                    </svg>
-                  ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                      <circle cx="12" cy="12" r="3"/>
-                    </svg>
-                  )}
-                </button>
-              </div>
+              <PasswordInput
+                id="confirmPassword"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Repetí tu nueva contraseña"
+                disabled={isLoading}
+                autoComplete="new-password"
+              />
               {confirmPassword.length > 0 && newPassword !== confirmPassword && (
                 <span className="cp-mismatch">Las contraseñas no coinciden</span>
               )}
@@ -186,7 +153,7 @@ function ChangePassword() {
         </div>
 
         <div className="cp-footer">
-          <button className="cp-logout-link" onClick={logout} disabled={isLoading}>
+          <button type="button" className="cp-logout-link" onClick={handleLogout} disabled={isLoading}>
             Cerrar sesión
           </button>
         </div>
