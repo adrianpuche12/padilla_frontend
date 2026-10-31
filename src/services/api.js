@@ -18,6 +18,7 @@ const MARGEN_MS = 30_000;
 
 const api = axios.create({
   baseURL: API_URL,
+  timeout: 20000,
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -60,10 +61,9 @@ export function refreshTokens() {
 export function endSession() {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(REFRESH_TOKEN_KEY);
+  // PRO-111 (B-08): sin recarga completa. AuthContext escucha el evento, cierra la sesión y
+  // PrivateRoute manda al login recordando la pantalla (antes se perdía lo que se estaba cargando).
   window.dispatchEvent(new CustomEvent('propero:logout'));
-  if (window.location.pathname !== '/login') {
-    window.location.href = '/login';
-  }
 }
 
 api.interceptors.request.use(async (config) => {

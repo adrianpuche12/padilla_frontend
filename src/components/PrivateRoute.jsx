@@ -1,4 +1,4 @@
-import { Link, Navigate } from 'react-router-dom';
+import { Link, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { hasAnyRole } from '../auth/roles';
 
@@ -8,7 +8,8 @@ import { hasAnyRole } from '../auth/roles';
  * lo frenaba.
  */
 function PrivateRoute({ children, roles }) {
-  const { isAuthenticated, isLoading, roles: userRoles } = useAuth();
+  const { isAuthenticated, isLoading, roles: userRoles, mustChangePassword } = useAuth();
+  const location = useLocation();
 
   if (isLoading) {
     return (
@@ -19,7 +20,12 @@ function PrivateRoute({ children, roles }) {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    // PRO-111 (B-01): después del login vuelve a la pantalla donde estaba
+    return <Navigate to="/login" replace state={{ from: location }} />;
+  }
+
+  if (mustChangePassword) {
+    return <Navigate to="/change-password" replace />;
   }
 
   if (roles && !hasAnyRole(userRoles, roles)) {

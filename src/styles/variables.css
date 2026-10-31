@@ -87,6 +87,7 @@
   --text-muted: var(--color-gray-500);
   --text-placeholder: var(--color-gray-400);
   --text-inverse: var(--color-white);
+  --text-on-dark: #ffffff; /* texto sobre sidebar y botones de marca: NO se cambia en dark (B-05) */
 
   /* Borders */
   --border-color: var(--color-gray-200);

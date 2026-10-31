@@ -191,7 +191,7 @@ function App() {
       <Route path="/change-password" element={<ChangePassword />} />
 
       {/* Ruta publica - Olvidé mi contraseña */}
-      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
 
       {/* Redireccion por defecto */}
       <Route path="/" element={<Navigate to="/dashboard" replace />} />

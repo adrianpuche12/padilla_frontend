@@ -23,7 +23,7 @@
 
 .login-header {
   background: var(--brand-color-dark, var(--color-primary));
-  color: var(--text-inverse);
+  color: var(--text-on-dark);
   padding: var(--spacing-xl);
   text-align: center;
   display: flex;
@@ -41,7 +41,7 @@
   font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-bold);
   letter-spacing: 1px;
-  color: var(--text-inverse);
+  color: var(--text-on-dark);
 }
 
 .login-brand-tagline {

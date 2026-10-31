@@ -6,12 +6,16 @@ const AuthContext = createContext(null);
 
 const TOKEN_KEY = 'access_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
+// PRO-111 (A-02): el cambio de contraseña del primer ingreso queda guardado; antes solo servía para el
+// redirect inmediato y escribiendo /dashboard en la URL se salteaba.
+const MUST_CHANGE_KEY = 'propero_must_change_password';
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [roles, setRoles] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [mustChangePassword, setMustChangePassword] = useState(() => localStorage.getItem(MUST_CHANGE_KEY) === '1');
 
   // Verificar si hay sesion guardada al cargar.
   // PRO-090: si el token vencio, se espera el refresh ANTES de terminar de cargar (antes isLoading pasaba
@@ -63,9 +67,19 @@ export function AuthProvider({ children }) {
   };
 
   const login = async (username, password) => {
-    const data = await authService.login(username, password);
+    const data = await authService.login(username.trim(), password);
+    if (data.first_login) {
+      localStorage.setItem(MUST_CHANGE_KEY, '1');
+      setMustChangePassword(true);
+    }
     saveTokens(data);
     return data;
+  };
+
+  /** Llamar después de cambiar la contraseña del primer ingreso. */
+  const completePasswordChange = () => {
+    localStorage.removeItem(MUST_CHANGE_KEY);
+    setMustChangePassword(false);
   };
 
   const logout = async () => {
@@ -85,6 +99,8 @@ export function AuthProvider({ children }) {
   const handleLogout = () => {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
+    localStorage.removeItem(MUST_CHANGE_KEY);
+    setMustChangePassword(false);
     setUser(null);
     setRoles([]);
     setIsAuthenticated(false);
@@ -127,6 +143,8 @@ export function AuthProvider({ children }) {
     isSuperAdmin,
     isManager,
     hasManagementRole,
+    mustChangePassword,
+    completePasswordChange,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
