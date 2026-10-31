@@ -4,7 +4,7 @@ import '../pages/Modules.css';
 
 /**
  * PRO-102 / PRO-103: adjuntos de una entidad (TICKET, CONTRATO, PROPIEDAD, CLIENTE, PROVEEDOR, RESERVA).
- * Imagenes y PDF hasta 10 MB. El backend decide quien ve y quien sube (misma regla que la entidad).
+ * Imagenes y PDF hasta 10 MB; videos hasta 50 MB (PRO-120, los suben sobre todo desde la app). El backend decide quien ve y quien sube (misma regla que la entidad).
  */
 function Attachments({ entityType, entityId, canUpload = true, withExpiry = false, title = 'Archivos adjuntos' }) {
   const [items, setItems] = useState([]);
@@ -21,7 +21,8 @@ function Attachments({ entityType, entityId, canUpload = true, withExpiry = fals
   const subir = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 10 * 1024 * 1024) { setError('El archivo supera los 10 MB'); return; }
+    const esVideo = file.type.startsWith('video/');
+    if (file.size > (esVideo ? 50 : 10) * 1024 * 1024) { setError(esVideo ? 'El video supera los 50 MB' : 'El archivo supera los 10 MB'); return; }
     const data = new FormData();
     data.append('file', file);
     data.append('entityType', entityType);
@@ -67,7 +68,7 @@ function Attachments({ entityType, entityId, canUpload = true, withExpiry = fals
       {canUpload && (
         <div style={{ display: 'flex', gap: 8, marginTop: 8, alignItems: 'center', flexWrap: 'wrap' }}>
           {withExpiry && <label className="module-field">Vence<input type="date" value={vence} onChange={e => setVence(e.target.value)} /></label>}
-          <input ref={fileRef} type="file" accept="image/*,application/pdf" onChange={subir} disabled={uploading} aria-label="Subir archivo" />
+          <input ref={fileRef} type="file" accept="image/*,video/mp4,video/quicktime,video/webm,application/pdf" onChange={subir} disabled={uploading} aria-label="Subir archivo" />
           {uploading && <span className="module-muted">Subiendo...</span>}
         </div>
       )}
